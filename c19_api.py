@@ -1,6 +1,7 @@
 import flask
 from flask import request, jsonify
 import sqlite3
+from scraper import get_data, filter_by_country
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -22,16 +23,38 @@ def page_not_found():
 @app.route('/', methods=['GET'])
 def home():
     home_page_message = '''<h1>COVID-19 Treatment Tracker API</h1>
-                               <p>An API for tracking the development of cures and prevention medication.</p>'''
+                               <p>An API for tracking the development of cures and prevention medication.</p>
+                               <a href=./api/v1/cases/all>cases </a>
+                               <a href=./api/v1/treatments/all>treatments </a>'''
+    
     return home_page_message
+
+
+# -------------------------
+# Accessing country data.
+# -------------------------
+@app.route('/api/v1/cases/all', methods=['GET'])
+def cases_all():
+    country_data = get_data()
+    return jsonify(country_data)
+
+
+@app.route('/api/v1/cases', methods=['GET'])
+def cases_filter():
+    query_params = request.args
+    country = query_params.get('country')
+
+    if country:
+        filtered_data = [filter_by_country(country)]
+        return jsonify(filtered_data)
 
 
 # -------------------------
 # Accessing treatment data.
 # -------------------------
 
-@app.route('/api/v1/treatments/all', methods=['GET'])
-def api_treatments_all():
+@app.route('/api/v1/treatments/all', methods=['GET'])   # TODO: change database name
+def treatments_all():
     connection_ = sqlite3.connect('treatments.db')
     connection_.row_factory = dict_factory
     cursor_ = connection_.cursor()
@@ -40,8 +63,8 @@ def api_treatments_all():
     return jsonify(all_treatments)
 
 
-@app.route('/api/v1/treatments', methods=['GET'])
-def api_treatments_filter():
+@app.route('/api/v1/treatments', methods=['GET'])    # TODO: change param names
+def treatments_filter():
     query_params = request.args
 
     id = query_params.get('id')
