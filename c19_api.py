@@ -23,11 +23,13 @@ def page_not_found():
 @app.route('/', methods=['GET'])
 def home():
     home_page_message = '''<h1>COVID-19 Treatment Tracker API</h1>
-                               <p>An API for tracking the development of cures and prevention medication.</p>
-                               <a href=./api/v1/cases/all>cases </a>
-                               <a href=./api/v1/treatments/all>treatments </a>'''
+                               <p>An API for tracking the development of cures and prevention medication.</p>'''
+    home_page_links = '''<ul>
+                             <li><a href=./api/v1/cases/all>cases</a></li>
+                             <li><a href=./api/v1/treatments/all>treatments</a></li>
+                         </ul>'''
     
-    return home_page_message
+    return home_page_message + home_page_links
 
 
 # -------------------------
