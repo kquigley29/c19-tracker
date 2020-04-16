@@ -2,7 +2,6 @@ import flask
 from flask import request, jsonify
 import sqlite3
 from scraper import get_data, filter_by_country
-from converter import csv_to_dict, pdf_to_csv
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -55,14 +54,6 @@ def cases_filter():
 # -------------------------
 # Accessing treatment data.
 # -------------------------
-
-# ***without database?***
-# @app.route('/api/v1/treatments/all', methods=['GET'])
-# def treatments_all():
-#     treatments_dict = csv_to_dict('c19_treatments.csv')
-#     return jsonify(treatments_dict)
-
-
 @app.route('/api/v1/treatments/all', methods=['GET'])   # TODO: change database name
 def treatments_all():
     connection_ = sqlite3.connect('treatments.db')
