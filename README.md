@@ -6,7 +6,8 @@ An online tracker for the treatment of and the economic impact caused by Covid-1
 
 To install the packages run
 ```bash
-pip install <package>```
+pip install <package>
+```
 
 The documentation for `covid` can be found [here](https://ahmednafies.github.io/covid/)
 
