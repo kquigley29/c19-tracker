@@ -33,3 +33,24 @@ def csv_to_dict(file):
     for line in reader:
         dict_list.append(line)
     return dict_list
+
+
+possible_comma_strings = [','*10, ','*9, ','*8, ','*7, ','*6, ','*5, ','*4, ','*3, ','*2, ',']
+
+def remove_new_lines_in_quotes(file):
+    with open(file, 'r') as read_file:
+        file_text = read_file.read()
+    quote_count = 0
+    previous_c = ''
+    new_text = ""
+    for c in file_text:
+        new_text += c
+        if quote_count % 2:
+            if previous_c + c == '\n':
+                new_text = new_text[:-2]
+        elif not (quote_count % 2):
+            continue
+        previous_c = c
+    with open(file, 'a') as write_file:
+        write_file.write(new_text)
+    return new_text
