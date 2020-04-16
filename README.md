@@ -14,9 +14,9 @@ The documentation for `covid` can be found [here](https://ahmednafies.github.io/
 ## Data
 The data presented includes death, recovery and infection numbers and treatment development
 
-### Death, Recovery and Infection
+#### Death, Recovery and Infection
 This data is scaped by the `covid` package in `scraper.py`
 The source is [John Hopkins University API](https://coronavirus.jhu.edu/map.html) by default but can be specified to be [worldometers.info](www.worldometers.info)
 
-### Treatment
+#### Treatment
 This data is taken from [Milken Institute](https://milkeninstitute.org/covid-19-tracker)
