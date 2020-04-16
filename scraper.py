@@ -2,9 +2,8 @@ from covid import Covid
 from bs4 import BeautifulSoup
 import requests
 import csv
-import sqlite3
-from converter import pdf_to_csv, csv_to_dict
 
+from converter import pdf_to_csv, csv_to_dict
 
 
 # ----------------------------
@@ -51,4 +50,5 @@ def get_treatment_data():
         
 
 if __name__ == '__main__':
+    get_cases_data()
     get_treatment_data()

@@ -1,11 +1,15 @@
 import flask
 from flask import request, jsonify
+# from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 from scraper import get_data, filter_by_country
 from converter import csv_to_dict, pdf_to_csv
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+
+# app.config["SQLALCHEMY_DATABASE_URI"] = True
+# db = SQLAlchemy(app)
 
 def dict_factory(cursor, row):
     d = {}
@@ -38,7 +42,7 @@ def home():
 # -------------------------
 @app.route('/api/v1/cases/all', methods=['GET'])
 def cases_all():
-    country_data = get_data()
+    cases_data = get_cases_data()
     return jsonify(country_data)
 
 
@@ -48,7 +52,7 @@ def cases_filter():
     country = query_params.get('country')
 
     if country:
-        filtered_data = [filter_by_country(country)]
+        filtered_cases_data = [filter_cases_by_country(country)]
         return jsonify(filtered_data)
 
 
@@ -111,4 +115,5 @@ def treatments_filter():
     return jsonify(results)
 
 
-app.run()
+if __name__ == '__main__':
+    app.run()
