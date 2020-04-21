@@ -26,11 +26,11 @@ def page_not_found():
 
 @app.route('/', methods=['GET'])
 def home():
-    home_page_message = '''<h1>COVID-19 Treatment Tracker API</h1>
-                               <p>An API for tracking the development of cures and prevention medication.</p>'''
+    home_page_message = '''<h1>COVID-19 Tracker API</h1>
+                               <p>An API for tracking the corona-19 situation.</p>'''
     home_page_links = '''<ul>
                              <li><a href=./api/v1/cases/all>cases</a></li>
-                             <li><a href=./api/v1/treatments/all>treatments</a></li>
+                             <li><a href=./api/v1/population/all>population</a></li>
                          </ul>'''
     
     return home_page_message + home_page_links
@@ -41,8 +41,9 @@ def home():
 # -------------------------
 @app.route('/api/v1/cases/all', methods=['GET'])
 def cases_all():
+    cases_message = '''<h1>Cases Data</h>'''
     cases_data = get_cases_data()
-    return jsonify(country_data)
+    return jsonify(cases_data)
 
 
 @app.route('/api/v1/cases', methods=['GET'])
