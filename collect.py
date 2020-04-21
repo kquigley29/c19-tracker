@@ -69,7 +69,7 @@ def get_population_data():
             row_dict['population'] = None
         
         try:
-            row_dict['yearly change'] = float(row[3].replace('%', '')) / 100
+            row_dict['yearly change'] = float(row[3].replace('%', ''))
         except ValueError:
             row_dict['yearly change'] = None
         
@@ -104,12 +104,12 @@ def get_population_data():
             row_dict['median age'] = None
         
         try:
-            row_dict['urban population %'] = float(row[10].replace('%', '')) / 100
+            row_dict['urban population %'] = float(row[10].replace('%', ''))
         except ValueError:
             row_dict['urban population %'] = None
         
         try:
-            row_dict['world share %'] = float(row[11].replace('%', '')) / 100
+            row_dict['world share %'] = float(row[11].replace('%', ''))
         except ValueError:
             row_dict['world share %'] = None
 

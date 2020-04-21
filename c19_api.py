@@ -28,8 +28,14 @@ def home():
     home_page_message = '''<h1>COVID-19 Tracker API</h1>
                                <p>An API for tracking the corona-19 situation.</p>'''
     home_page_links = '''<ul>
-                             <li><a href=./api/v1/cases/all>cases</a></li>
-                             <li><a href=./api/v1/population/all>population</a></li>
+                             <li>cases
+                                 <br><a href=./api/v1/cases/all?format=json>json</a>
+                                 <br><a href=./api/v1/cases/all?format=html>html</a>
+                             </li>
+                             <li>population
+                                 <br><a href=./api/v1/population/all?format=json>json</a>
+                                 <br><a href=./api/v1/population/all?format=html>html</a>
+                             </li>
                          </ul>'''
     
     return home_page_message + home_page_links
