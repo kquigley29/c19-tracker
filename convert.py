@@ -2,9 +2,9 @@ import tabula
 from csv import DictReader
 
 
-def pdf_to_csv(input_file, csv_file=input_file[:-4]+'.csv'):
+def pdf_to_csv(input_file):
     table = tabula.read_pdf(input_file, pages='all')
-    tabula.convert_into(input_file, csv_file_name, pages='all')
+    tabula.convert_into(input_file, input_file[:-4]+'.csv', pages='all')
 
 
 def csv_to_dict(file):

@@ -2,7 +2,7 @@ import flask
 from flask import request, jsonify
 # from flask_sqlalchemy import SQLAlchemy
 import sqlite3
-from scraper import get_data, filter_by_country
+from collect import get_data, filter_by_country
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -52,7 +52,23 @@ def cases_filter():
 
     if country:
         filtered_cases_data = [filter_cases_by_country(country)]
-        return jsonify(filtered_data)
+        return jsonify(filtered_cases_data)
+
+
+@app.route('/api/v1/population/all', methods=['GET'])
+def pop_all():
+    pop_data = get_population_data()
+    return jsonify(pop_data)
+
+
+@app.route('/api/v1/population', methods=['GET'])
+def pop_filter():
+    query_params = request.args
+    country = query_params.get('country')
+
+    if country:
+        filtered_pop_data = [filter_population_data(country)]
+        return jsonify(filtered_pop_data)
 
 
 # -------------------------
