@@ -1,7 +1,5 @@
 import flask
 from flask import request, jsonify
-# from flask_sqlalchemy import SQLAlchemy
-import sqlite3
 from collect import get_cases_data, filter_cases_by_country, get_population_data,filter_population_data
 
 app = flask.Flask(__name__)
