@@ -48,10 +48,7 @@ def get_population_data():
         row_list = []
         row_data = row.find_all('td')
         for entry in row_data:
-            if entry.text != 'N/A':
-                row_list.append(entry.text)
-            else:
-                row_list.append(None)
+            row_list.append(entry.text)
         table_list.append(row_list)
 
     # convert table list to dictionary to return
@@ -126,6 +123,21 @@ def filter_population_data(country_name):
             return entry
         
 
+# test functions
+def find_country(country_name):
+    data = get_population_data()
+    for d in data:
+        if d['country'] == country_name:
+            return d
+
+def ranks():
+    data = get_population_data()
+    r = []
+    for d in data:
+        r.append(d['rank'])
+    return r
+    
+
 # to test the functions
 if __name__ == '__main__':
-    get_population_data()
+    pass
