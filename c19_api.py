@@ -1,10 +1,13 @@
 import flask
 from flask import request, jsonify
-import sqlite3
-from scraper import get_data, filter_by_country
+from collect import get_cases_data, filter_cases_by_country, get_population_data,filter_population_data
+from convert import dict_to_html
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+
+# app.config["SQLALCHEMY_DATABASE_URI"] = True
+# db = SQLAlchemy(app)
 
 def dict_factory(cursor, row):
     d = {}
@@ -14,19 +17,19 @@ def dict_factory(cursor, row):
 
 
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(error):
     error_404_message = '''<h1>404</h1>
                                <p>Resource not found.</p>'''
-    return error_404_message, 404
+    return error_404_message
 
 
 @app.route('/', methods=['GET'])
 def home():
-    home_page_message = '''<h1>COVID-19 Treatment Tracker API</h1>
-                               <p>An API for tracking the development of cures and prevention medication.</p>'''
+    home_page_message = '''<h1>COVID-19 Tracker API</h1>
+                               <p>An API for tracking the corona-19 situation.</p>'''
     home_page_links = '''<ul>
                              <li><a href=./api/v1/cases/all>cases</a></li>
-                             <li><a href=./api/v1/treatments/all>treatments</a></li>
+                             <li><a href=./api/v1/population/all>population</a></li>
                          </ul>'''
     
     return home_page_message + home_page_links
@@ -37,69 +40,99 @@ def home():
 # -------------------------
 @app.route('/api/v1/cases/all', methods=['GET'])
 def cases_all():
-    country_data = get_data()
-    return jsonify(country_data)
+    cases_message = '''<h1>Cases Data</h>'''
+    cases_data = get_cases_data()
+
+    # check for format param
+    query_params = request.args
+    format = query_params.get('format')
+    if format:
+        if format == 'json':
+            return jsonify(cases_data)
+
+        elif format == 'html':
+            return dict_to_html(cases_data)
+        
+        elif format != 'json' and format != 'html':
+            return "<h1>Error</h1><p>Format unavaliable</p>"
+    
+    # if no params is given, return as json
+    else:
+        return jsonify(cases_data)
 
 
 @app.route('/api/v1/cases', methods=['GET'])
 def cases_filter():
     query_params = request.args
     country = query_params.get('country')
+    format = query_params.get('format')
+
+    # get the requested country
+    if country:
+        filtered_cases_data = [filter_cases_by_country(country)]
+
+    # display the data in the requested format
+    if format:
+        if format == 'json':
+            return jsonify(filtered_cases_data)
+
+        elif format == 'html':
+            return dict_to_html(filtered_cases_data)
+        
+        elif format != 'json' and format != 'html':
+            return "<h1>Error</h1><p>Format unavaliable</p>"
+    
+    # if no format is requested display in json
+    else:
+        return jsonify(filtered_cases_data)
+
+
+@app.route('/api/v1/population/all', methods=['GET'])
+def pop_all():
+    pop_data = get_population_data()
+
+    # check for format param
+    query_params = request.args
+    format = query_params.get('format')
+    if format:
+        if format == 'json':
+            return jsonify(pop_data)
+
+        elif format == 'html':
+            return dict_to_html(pop_data)
+        
+        elif format != 'json' and format != 'html':
+            return "<h1>Error</h1><p>Format unavaliable</p>"
+    
+    # if no params is given, return as json
+    else:
+        return jsonify(pop_data)
+
+
+@app.route('/api/v1/population', methods=['GET'])
+def pop_filter():
+    query_params = request.args
+    country = query_params.get('country')
+    format = query_params.get('format')
 
     if country:
-        filtered_data = [filter_by_country(country)]
-        return jsonify(filtered_data)
+        filtered_pop_data = [filter_population_data(country)]
 
+    # display the data in the requested format
+    if format:
+        if format == 'json':
+            return jsonify(filtered_pop_data)
 
-# -------------------------
-# Accessing treatment data.
-# -------------------------
-@app.route('/api/v1/treatments/all', methods=['GET'])   # TODO: change database name
-def treatments_all():
-    connection_ = sqlite3.connect('treatments.db')
-    connection_.row_factory = dict_factory
-    cursor_ = connection_.cursor()
-    all_treatments = cursor_.execute('SELECT * FROM treatments;').fetchall()
+        elif format == 'html':
+            return dict_to_html(filtered_pop_data)
+        
+        elif format != 'json' and format != 'html':
+            return "<h1>Error</h1><p>Format unavaliable</p>"
+    
+    # if no format is requested display in json
+    else:
+        return jsonify(filtered_pop_data)
+    
 
-    return jsonify(all_treatments)
-
-
-@app.route('/api/v1/treatments', methods=['GET'])    # TODO: change param names
-def treatments_filter():
-    query_params = request.args
-
-    id = query_params.get('id')
-    name = query_params.get('name')
-    stage = query_params.get('stage')
-    colaborators = query_params.get('colaborators')
-
-    query = "SELECT * FROM treatments WHERE"
-    to_filter = []
-
-    if id:
-        query += ' id=? AND'
-        to_filter.append(id)
-    if name:
-        query += ' name=? AND'
-        to_filter.append(name)
-    if stage:
-        query += ' stage=? AND'
-        to_filter.append(stage)
-    if colaborators:
-        query += ' colaborators=? AND'
-        to_filter.append(colaborators)
-    if not (id or name or stage or colaborators):
-        return error_404_message()
-
-    query = query[:-4] + ';'
-
-    connection_ = sqlite3.connect('treatments.db')
-    connection_.row_factory = dict_factory
-    cursor_ = connection_.cursor()
-
-    results = cursor_.execute(query, to_filter).fetchall()
-
-    return jsonify(results)
-
-
-app.run()
+if __name__ == '__main__':
+    app.run()
