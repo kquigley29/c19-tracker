@@ -35,13 +35,28 @@
                 ></b-pagination>
             </b-tab>
             <b-tab :disabled="isBusy" title="Map">
-                <object id="worldmap" type="image/svg+xml" width="100%" height="10%" ref="map" data="assets/world.svg"></object>
-            
+                
+                <b-card no-body>
+                    <b-tabs card>
+                        <b-tab title="Cases">
+                        <h3>Cases per million heatmap:</h3>
+                        <object id="casesWordlMap" type="image/svg+xml" width="100%" height="10%" ref="casesMap" data="assets/world.svg"></object>   
+                        </b-tab>
+                        <b-tab title="Deaths">
+                        <h3>Deaths per million heatmap:</h3>             
+                        <object id="deathsWorldMap" type="image/svg+xml" width="100%" height="10%" ref="deathsMap" data="assets/world.svg"></object>
+                        </b-tab>
+                        <b-tab title="Tests">
+                        <h3>Tests per million heatmap:</h3>             
+                        <object id="testsWorldMap" type="image/svg+xml" width="100%" height="10%" ref="testsMap" data="assets/world.svg"></object>
+                        </b-tab>
+                    </b-tabs>
+                </b-card>
             </b-tab>
         </b-tabs>
         </b-card>
 
-        <b-modal id="modal-1" title="Country Data">
+        <b-modal modal-class="lg" ok-only size="lg" id="modal-1" scrollable :title=modalCountry.name>
             <country-data v-if="modalCountry != {}" :country="modalCountry"/>
         </b-modal>
     </div>
@@ -51,6 +66,7 @@
 
 //display the coountrydata component in the modal when country clicked on
 import CountryData from "./CountryData.vue"
+import lodash from 'lodash'
 
 export default {
     components:{
@@ -68,19 +84,59 @@ export default {
         //this is to populate the map with data when the countries is filled from api, this is better to do 
         //in a method call from parents but still works
         countries: function(newVal){
-            var a = document.querySelector("#worldmap");
             var vm = this;
-            var svgDoc;
-            console.log(newVal)
-            a.addEventListener("load", function(){
-                svgDoc = a.contentDocument;
+            var casesMap = this.$refs.casesMap
+            
+            var casesDoc;
+            casesMap.addEventListener("load", function(){
+                casesDoc = casesMap.contentDocument;
+                
                 for(let i=0; i<newVal.length; i++){
                     var r = '[data-name="';
                     var s = r.concat(newVal[i].name)
                     var t = s.concat('"]')
                     try{
-                        var path = svgDoc.querySelectorAll(t)
-                        var val = Math.round(255 - ((newVal[i].total_deaths / vm.maxDeaths) * 255))
+                        
+                        var path = casesDoc.querySelectorAll(t)
+                        var val = Math.round(255 - ((newVal[i].total_cases_per_million / vm.maxCasesMillion) * 255))
+                        path[0].style.fill=vm.rgbToHex(val, val, val)
+                        
+                    }
+                    catch(e){
+                        console.log(e)
+                    }
+                }
+            })
+            var deathsMap = this.$refs.deathsMap
+            var deathsDoc;
+            deathsMap.addEventListener("load", function(){
+                deathsDoc = deathsMap.contentDocument;
+                for(let i=0; i<newVal.length; i++){
+                    var r = '[data-name="';
+                    var s = r.concat(newVal[i].name)
+                    var t = s.concat('"]')
+                    try{
+                        var path = deathsDoc.querySelectorAll(t)
+                        var val = Math.round(255 - ((newVal[i].total_deaths_per_million / vm.maxDeathsMillion) * 255))
+                        path[0].style.fill=vm.rgbToHex(val, val, val)
+                        
+                    }
+                    catch(e){
+                        console.log(e)
+                    }
+                }
+            })
+            var testsMap = this.$refs.testsMap
+            var testsDoc;
+            testsMap.addEventListener("load", function(){
+                testsDoc = testsMap.contentDocument;
+                for(let i=0; i<newVal.length; i++){
+                    var r = '[data-name="';
+                    var s = r.concat(newVal[i].name)
+                    var t = s.concat('"]')
+                    try{
+                        var path = testsDoc.querySelectorAll(t)
+                        var val = Math.round(255 - ((newVal[i].total_tests_per_thousand / vm.maxTestsThousand) * 255))
                         path[0].style.fill=vm.rgbToHex(val, val, val)
                         
                     }
@@ -102,12 +158,14 @@ export default {
             modalCountry: {},
             //current page  of table
             currentPage: 1,
-            //fields to be used in table
+            //fields to be used in table, the tests and per million columns are hidden for screens < medium
             fields: [
                 {key: 'name', sortable: true}, 
                 {key: 'total_cases', sortable: true}, 
                 {key: 'total_deaths', sortable: true}, 
-                {key: 'total_tests', sortable: true}
+                {key: 'total_tests', sortable: true, class: "d-none d-md-table-cell"},
+                {key: 'total_deaths_per_million', sortable: true, class: "d-none d-md-table-cell"},
+                {key: 'total_cases_per_million', sortable: true, class: "d-none d-md-table-cell"}
                 ]
         }
     },
@@ -116,11 +174,13 @@ export default {
         //then filters for the search query
         computedList: function () {
             var vm = this
-            let tempList = this.countries
+            let tempList = lodash.cloneDeep(this.countries)
             tempList.forEach(element => {
                 element.total_cases = this.numberWithCommas(element.total_cases)
                 element.total_deaths = this.numberWithCommas(element.total_deaths)
                 element.total_tests = this.numberWithCommas(element.total_tests)
+                element.total_deaths_per_million = this.numberWithCommas(element.total_deaths_per_million)
+                element.total_cases_per_million = this.numberWithCommas(element.total_cases_per_million)
                 
                 if(element.total_tests == '0'){
                     element.total_tests = '-'
@@ -139,6 +199,12 @@ export default {
         maxDeathsMillion: function(){
             return Math.max.apply(Math, this.countries.map(function(o) { return o.total_deaths_per_million; }))
         },
+        maxCasesMillion: function(){
+            return Math.max.apply(Math, this.countries.map(function(o) { return o.total_cases_per_million; }))
+        },
+        maxTestsThousand: function(){
+            return Math.max.apply(Math, this.countries.map(function(o) { return o.total_tests_per_thousand; }))
+        },
     },
     methods:{
         onSorted(a, b, field){
@@ -154,7 +220,7 @@ export default {
                 }
             }
             else{
-                
+
                 //replace the "," in the parsed table values
                 let aVal = parseInt(a[field].replace(new RegExp(",", "g"), "").replace("-", "0"))
                 let bVal = parseInt(b[field].replace(new RegExp(",", "g"), "").replace("-", "0"))
