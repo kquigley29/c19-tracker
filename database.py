@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, Integer, Float, String, MetaData, ForeignKey
+from sqlalchemy import Table, Column, Integer, Float, String, MetaData
 
 
 # Global Variables

@@ -1,10 +1,8 @@
 from covid import Covid
 from bs4 import BeautifulSoup
 import requests
-import csv
-
-from convert import pdf_to_csv, csv_to_dict
 from database import *
+from convert import csv_to_dict
 
 
 # --------------------------------
@@ -138,11 +136,8 @@ def get_all_data():
     response = requests.get('https://covid.ourworldindata.org/data/owid-covid-data.csv')
     with open('data.csv', '+wb') as data_csv:
         data_csv.write(response.content)
-    data_dict_dirty = csv_to_dict('data.csv')
-    data_dict_clean = []
-    for d in data_dict_dirty:
-        data_dict_clean.append(d)
-    return data_dict_clean
+    data_dict = csv_to_dict('data.csv')
+    return data_dict
 
 
 def get_current_data():
