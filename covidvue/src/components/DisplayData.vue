@@ -13,6 +13,7 @@
             striped hover 
             :items="computedList" 
             :fields="fields"
+            :sort-compare="onSorted"
             @row-clicked='rowClicked'>
                 <template v-slot:table-busy>
                     <div class="text-center  my-2">
@@ -70,6 +71,7 @@ export default {
             var a = document.querySelector("#worldmap");
             var vm = this;
             var svgDoc;
+            console.log(newVal)
             a.addEventListener("load", function(){
                 svgDoc = a.contentDocument;
                 for(let i=0; i<newVal.length; i++){
@@ -139,6 +141,36 @@ export default {
         },
     },
     methods:{
+        onSorted(a, b, field){
+            if(field == 'name'){
+                if(a.name < b.name){
+                    return -1
+                }
+                else if(a.name == b.name){
+                    return 0
+                }
+                else{
+                    return 1
+                }
+            }
+            else{
+                
+                //replace the "," in the parsed table values
+                let aVal = parseInt(a[field].replace(new RegExp(",", "g"), "").replace("-", "0"))
+                let bVal = parseInt(b[field].replace(new RegExp(",", "g"), "").replace("-", "0"))
+                
+                if(aVal < bVal){
+                    return -1
+                }
+                else if(aVal == bVal){
+                    return 0
+                }
+                else{
+                    return 1
+                }
+            }
+        
+        },
         //add commas into a number string, utility function
         numberWithCommas(x) {
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
