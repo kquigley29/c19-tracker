@@ -4,6 +4,7 @@ import requests
 import csv
 
 from convert import pdf_to_csv, csv_to_dict
+from database import *
 
 
 # --------------------------------
@@ -17,6 +18,7 @@ cov = Covid()
 def get_cases_data():
     data = cov.get_data()
     return data
+
 
 # filter country case deaths by country name
 def filter_cases_by_country(country_name):
@@ -112,7 +114,7 @@ def get_population_data():
 
         table_data.append(row_dict)
 
-    return table_data  
+    return table_data
 
 
 # filter country population data by country name
@@ -121,14 +123,55 @@ def filter_population_data(country_name):
     for entry in data:
         if country_name == entry.get('country'):
             return entry
-        
 
+
+# -----------------------------------------------------------------
+# Get all data from https://github.com/owid/covid-19-data/ csv file
+# -----------------------------------------------------------------
+
+# Create the database
+covid_db = Database(SQLITE, dbname='covid.db')
+covid_db.create_db_tables()
+
+
+def get_all_data():
+    response = requests.get('https://covid.ourworldindata.org/data/owid-covid-data.csv')
+    with open('data.csv', '+wb') as data_csv:
+        data_csv.write(response.content)
+    data_dict_dirty = csv_to_dict('data.csv')
+    data_dict_clean = []
+    for d in data_dict_dirty:
+        data_dict_clean.append(d)
+    return data_dict_clean
+
+
+def get_current_data():
+    current_data = []
+    all_data = get_all_data()
+    for i in range(len(all_data)-1):
+        if all_data[i]['iso_code'] != all_data[i+1]['iso_code']:
+            current_data.append(all_data[i])
+    current_data.append(all_data[-1])
+    return current_data
+
+
+def update_data():
+    # all_data = get_all_data()
+    current_data = get_current_data()
+    # covid_db.insert(current_data, all_data)
+    covid_db.insert(current_data)
+
+
+# --------------
 # test functions
+# --------------
+
 def find_country(country_name):
     data = get_population_data()
     for d in data:
         if d['country'] == country_name:
             return d
+
 
 def ranks():
     data = get_population_data()
@@ -138,6 +181,9 @@ def ranks():
     return r
     
 
-# to test the functions
+# -------------------
+# Update the database
+# -------------------
+
 if __name__ == '__main__':
-    pass
+    update_data()
