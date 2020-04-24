@@ -2,13 +2,7 @@ import csv
 import requests
 import codecs
 from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy_utils import database_exists, create_database
-from sqlalchemy import Column, Integer, Float, Date, Text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from models import OxfordData
-from models import Base
 
 
 def stringToFloat(str):
@@ -20,28 +14,17 @@ def stringToFloat(str):
     finally:
         return b
 
-
-if __name__ == '__main__':
-    engine = create_engine("sqlite:///countryData.db")
-
-    Base.metadata.create_all(engine)
-
-    if not database_exists(engine.url):
-        create_database(engine.url)
-
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def oxford(thisSession):
     try:
         url = "https://ocgptweb.azurewebsites.net/CSVDownload"
         response = requests.get(url)
         text = response.iter_lines()
         cr = csv.reader(codecs.iterdecode(text, 'utf-8'), delimiter=",")
 
-        session.query(OxfordData).delete()
+        thisSession.query(OxfordData).delete()
 
         first_row=next(cr)
         for row in cr:
-            #print(row[2].split("-")[0])
             oxfordData= OxfordData(**{
                 'name': row[0],
                 'date': datetime(int(row[2][0:4]), int(row[2][4:6]), int(row[2][6:])),
@@ -62,12 +45,12 @@ if __name__ == '__main__':
                 'stringency_index_for_display': stringToFloat(row[38])
             })
 
-            session.add(oxfordData)
-        session.commit()
+            thisSession.add(oxfordData)
+        thisSession.commit()
     
     except Exception as e:
         print(e)
-        session.rollback()
+        thisSession.rollback()
+
     finally:
-        
-        session.close()
+        thisSession.close()

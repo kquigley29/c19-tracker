@@ -2,13 +2,7 @@ import csv
 import requests
 import codecs
 from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy_utils import database_exists, create_database
-from sqlalchemy import Column, Integer, Float, Date, Text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from models import Country_Data
-from models import Base
+from models import OwidData
 
 
 def stringToFloat(str):
@@ -21,28 +15,19 @@ def stringToFloat(str):
         return b
 
 
-if __name__ == '__main__':
-    engine = create_engine("sqlite:///countryHistories.db")
-
-    Base.metadata.create_all(engine)
-
-    if not database_exists(engine.url):
-        create_database(engine.url)
-
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def owid(thisSession):
     try:
         url = "https://covid.ourworldindata.org/data/owid-covid-data.csv"
         response = requests.get(url)
         text = response.iter_lines()
         cr = csv.reader(codecs.iterdecode(text, 'utf-8'), delimiter=",")
 
-        session.query(Country_Data).delete()
+        thisSession.query(OwidData).delete()
 
         first_row=next(cr)
         for row in cr:
             #print(row[2].split("-")[0])
-            countryData= Country_Data(**{
+            owidData= OwidData(**{
                 'name': row[1],
                 'date': datetime(int(row[2].split("-")[0]), int(row[2].split("-")[1]), int(row[2].split("-")[2])),
                 'total_cases': stringToFloat(row[3]),
@@ -52,12 +37,12 @@ if __name__ == '__main__':
                 'total_tests': stringToFloat(row[11]),
                 'total_tests_per_thousand': stringToFloat(row[13])
             })
-            session.add(countryData)
-        session.commit()
+            thisSession.add(owidData)
+        thisSession.commit()
     
     except Exception as e:
         print(e)
-        session.rollback()
+        thisSession.rollback()
     finally:
         
-        session.close()
+        thisSession.close()

@@ -3,8 +3,8 @@ from sqlalchemy import Column, Integer, Float, Date, Text
 
 Base = declarative_base()
 
-class Country_Data(Base):
-    __tablename__ = 'Countries_history'
+class OwidData(Base):
+    __tablename__ = 'Owid_data'
     __table_args__ = {'sqlite_autoincrement': True}
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(Text) 
@@ -53,6 +53,7 @@ class OxfordData(Base):
     contact_tracing = Column(Integer)
     stringency_index = Column(Integer)
     stringency_index_for_display = Column(Integer)
+
 
     def __repr__(self):
         return f'Country {self.name}'
