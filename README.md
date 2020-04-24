@@ -1,22 +1,23 @@
 # c19-tracker
-An online tracker for the treatment of and the economic impact caused by Covid-19.
+An online tracker for the development and the economic and social impact of Covid-19.
 
 ## Packages
-`flask` and `covid` are required.
+`flask` and `sqlalchemy` are required.
 
 To install the packages run:
-```bash
-pip install <package>
 ```
-
-The documentation for `covid` can be found [here](https://ahmednafies.github.io/covid/).
+pip3 install <package>
+```
 
 ## Data Sources
 The data presented includes death, recovery and infection numbers and country population
 
 #### Death, Recovery and Infection
-This data is scaped by the `covid` package in `scraper.py`.
-The source is [John Hopkins University API](https://coronavirus.jhu.edu/map.html) by default but can be specified to be [worldometers.info](www.worldometers.info).
+This data comes from [Our World in Data](https://ourworldindata.org/). 
+Other sources are [John Hopkins University API](https://coronavirus.jhu.edu/map.html) and [worldometers.info](www.worldometers.info).
+
+#### Social and Economic 
+[Oxford University](https://www.research.ox.ac.uk/Area/coronavirus-research) provides data on the social and economic impact of the virus.
 
 #### Population
 This data is sources from [Worldometer.info](www.worldometers.info)
