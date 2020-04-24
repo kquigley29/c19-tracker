@@ -20,4 +20,4 @@ Other sources are [John Hopkins University API](https://coronavirus.jhu.edu/map.
 [Oxford University](https://www.research.ox.ac.uk/Area/coronavirus-research) provides data on the social and economic impact of the virus.
 
 #### Population
-This data is sources from [Worldometer.info](www.worldometers.info)
+This data is sourced from [Worldometer.info](www.worldometers.info)
