@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import OwidData, OxfordData
 from models import Base
+import json
 import copy
 
 
@@ -50,6 +51,7 @@ def allCountries():
     Session = sessionmaker(bind=engine)
     session = Session()
     query = session.query(OwidData).all()
+    
     length = len(query)
     r=[]
     for index, t in enumerate(query):
@@ -80,6 +82,7 @@ def allCountries():
                         break
                     i = i-1
             r.append(t.toJson())
+        session.close()
     return (jsonify(r))
 
 
@@ -96,9 +99,41 @@ def countryHistoryData(country):
         r.append(t.toJson())
     return (jsonify(r))
 
+#get past two weeks for every country
+@app.route("/owid/history/allRecent")
+@cross_origin()
+def allHistoryData():
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    query = session.query(OwidData).all()
+    session.close()
+    length = len(query)
+    temp = []
+    r = {}
+    for index, t in enumerate(query):
+        if index != (length-1):
+            if t.name != query[index+1].name:
+                numDays = 13
+                name = t.name
+                while(numDays>=0):
+                    temp.append(query[index-numDays].toJson())
+                    numDays = numDays-1
+                r[name] = copy.deepcopy(temp)
+                temp = []
+        else:
+
+            numDays = 13
+            name = t.name
+            while(numDays>=0):
+                temp.append(query[index-numDays].toJson())
+                numDays = numDays-1
+            r[name] = copy.deepcopy(temp)
+            temp = []
+    return (jsonify(r))
+
 
 # ----------
-# Oxfor data
+# Oxford data
 # ----------
 
 # get latest data for a country
@@ -149,4 +184,5 @@ def oxfordHistoryIndividual(country):
     return (jsonify(r))
 
 
-app.run()
+if(__name__ == '__main__'):
+    app.run()
