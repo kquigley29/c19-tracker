@@ -7,6 +7,7 @@ class Country_Data(Base):
     __tablename__ = 'Countries History'
     __table_args__ = {'sqlite_autoincrement': True}
     id = Column(Integer, primary_key=True, nullable=False)
+    iso = Column(Text)
     name = Column(Text) 
     date = Column(Date)
     total_cases = Column(Integer)
@@ -21,7 +22,8 @@ class Country_Data(Base):
     
     def toJson(self):
         return dict(
-            id=self.id, 
+            id=self.id,
+            iso=self.iso, 
             name=self.name, 
             date=self.date, 
             total_cases=self.total_cases, 

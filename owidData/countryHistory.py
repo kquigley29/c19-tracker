@@ -43,6 +43,7 @@ if __name__ == '__main__':
         for row in cr:
             #print(row[2].split("-")[0])
             countryData= Country_Data(**{
+                'iso': row[0],
                 'name': row[1],
                 'date': datetime(int(row[2].split("-")[0]), int(row[2].split("-")[1]), int(row[2].split("-")[2])),
                 'total_cases': stringToFloat(row[3]),

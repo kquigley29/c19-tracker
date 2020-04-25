@@ -2,18 +2,20 @@
     <div>
         <b-card class="mb-5" no-body>
         <b-tabs card>
-            <b-tab title="Statistics">
-            <input  v-model="query" placeholder="Country" class="mb-2 w-100 mt-3">
+            <b-tab no-body title="Statistics">
+            <input  v-model="query" placeholder=" Country" class=" w-100 mt-3">
             <b-table 
             responsive 
             outlined 
+            :filter="query"
             v-bind:current-page="currentPage" 
             v-bind:per-page="perPage" 
             :busy="isBusy"         
             striped hover 
-            :items="computedList" 
+            :items="countries" 
             :fields="fields"
-            :sort-compare="onSorted"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
             @row-clicked='rowClicked'>
                 <template v-slot:table-busy>
                     <div class="text-center  my-2">
@@ -34,30 +36,33 @@
                 :per-page="perPage"
                 ></b-pagination>
             </b-tab>
-            <b-tab :disabled="isBusy" title="Map">
-                
-                <b-card no-body>
-                    <b-tabs card>
-                        <b-tab title="Cases">
-                        <h3>Cases per million heatmap:</h3>
-                        <object id="casesWordlMap" type="image/svg+xml" width="100%" height="10%" ref="casesMap" data="assets/world.svg"></object>   
-                        </b-tab>
-                        <b-tab title="Deaths">
-                        <h3>Deaths per million heatmap:</h3>             
-                        <object id="deathsWorldMap" type="image/svg+xml" width="100%" height="10%" ref="deathsMap" data="assets/world.svg"></object>
-                        </b-tab>
-                        <b-tab title="Tests">
-                        <h3>Tests per million heatmap:</h3>             
-                        <object id="testsWorldMap" type="image/svg+xml" width="100%" height="10%" ref="testsMap" data="assets/world.svg"></object>
-                        </b-tab>
+            <b-tab no-body :disabled="isBusy" title="Map">
+                <!-- <b-card no-body> -->
+                    <b-tabs @activate-tab="changeMapData" card>
+                        <div class="mt-2">
+                            <b-tab class="text-center" no-body title="Cases">
+                                <!-- <h5>Cases per Million</h5> -->
+                            </b-tab>
+                            <b-tab no-body class="text-center" title="Deaths"> 
+                                <!-- <h5>Deaths per Million</h5>              -->
+                            </b-tab>
+                            <b-tab no-body class="text-center" title="Tests">
+                                <!-- <h5>Tests per Thousand</h5>          -->
+                            </b-tab>
+                        </div>
                     </b-tabs>
-                </b-card>
+                    <MapChart lowColor="#f9fdff" highColor="#12a0e8" v-if="countries.length > 5" :countryData="mapData"/>
+
+                <!-- </b-card> -->
             </b-tab>
         </b-tabs>
         </b-card>
 
-        <b-modal modal-class="lg" ok-only size="lg" id="modal-1" scrollable :title=modalCountry.name>
+        <b-modal body-class="p-1" modal-class="lg" ok-only size="lg" id="modal-1" scrollable :title=modalCountry.name>
             <country-data v-if="modalCountry != {}" :country="modalCountry"/>
+            <template v-slot:modal-footer>
+                <p></p>
+            </template>
         </b-modal>
     </div>
 </template>
@@ -66,11 +71,26 @@
 
 //display the coountrydata component in the modal when country clicked on
 import CountryData from "./CountryData.vue"
-import lodash from 'lodash'
+import MapChart from 'vue-map-chart'
+const {overwrite, getCode} = require('country-list')
+overwrite([{
+    code: 'US',
+    name: 'United States'
+},
+    {
+        code: 'RU',
+        name: 'Russia'
+    },
+    {
+        code: 'GB',
+        name: 'United Kingdom'
+    }
+])
 
 export default {
     components:{
-        CountryData
+        CountryData,
+        MapChart
     },
     name: "DataDisplay",
     props: {
@@ -81,75 +101,19 @@ export default {
         summary: Object
     },
     watch: {
-        //this is to populate the map with data when the countries is filled from api, this is better to do 
-        //in a method call from parents but still works
-        countries: function(newVal){
-            var vm = this;
-            var casesMap = this.$refs.casesMap
-            
-            var casesDoc;
-            casesMap.addEventListener("load", function(){
-                casesDoc = casesMap.contentDocument;
-                
-                for(let i=0; i<newVal.length; i++){
-                    var r = '[data-name="';
-                    var s = r.concat(newVal[i].name)
-                    var t = s.concat('"]')
-                    try{
-                        
-                        var path = casesDoc.querySelectorAll(t)
-                        var val = Math.round(255 - ((newVal[i].total_cases_per_million / vm.maxCasesMillion) * 255))
-                        path[0].style.fill=vm.rgbToHex(val, val, val)
-                        
-                    }
-                    catch(e){
-                        console.log(e)
-                    }
-                }
-            })
-            var deathsMap = this.$refs.deathsMap
-            var deathsDoc;
-            deathsMap.addEventListener("load", function(){
-                deathsDoc = deathsMap.contentDocument;
-                for(let i=0; i<newVal.length; i++){
-                    var r = '[data-name="';
-                    var s = r.concat(newVal[i].name)
-                    var t = s.concat('"]')
-                    try{
-                        var path = deathsDoc.querySelectorAll(t)
-                        var val = Math.round(255 - ((newVal[i].total_deaths_per_million / vm.maxDeathsMillion) * 255))
-                        path[0].style.fill=vm.rgbToHex(val, val, val)
-                        
-                    }
-                    catch(e){
-                        console.log(e)
-                    }
-                }
-            })
-            var testsMap = this.$refs.testsMap
-            var testsDoc;
-            testsMap.addEventListener("load", function(){
-                testsDoc = testsMap.contentDocument;
-                for(let i=0; i<newVal.length; i++){
-                    var r = '[data-name="';
-                    var s = r.concat(newVal[i].name)
-                    var t = s.concat('"]')
-                    try{
-                        var path = testsDoc.querySelectorAll(t)
-                        var val = Math.round(255 - ((newVal[i].total_tests_per_thousand / vm.maxTestsThousand) * 255))
-                        path[0].style.fill=vm.rgbToHex(val, val, val)
-                        
-                    }
-                    catch(e){
-                        console.log(e)
-                    }
-                }
-            })
+        countries: function(){
+            this.changeMapData(0)
         }
+        
     },
 
     data() {
         return{
+            //default sorting
+            mapData: {},
+            sortBy: "total_cases",
+            //sort descending
+            sortDesc: true,
             //query is to search the table and is bound to the table
             query: '',
             //number of countries per page on table
@@ -160,38 +124,29 @@ export default {
             currentPage: 1,
             //fields to be used in table, the tests and per million columns are hidden for screens < medium
             fields: [
-                {key: 'name', sortable: true}, 
-                {key: 'total_cases', sortable: true}, 
-                {key: 'total_deaths', sortable: true}, 
-                {key: 'total_tests', sortable: true, class: "d-none d-md-table-cell"},
-                {key: 'total_deaths_per_million', sortable: true, class: "d-none d-md-table-cell"},
-                {key: 'total_cases_per_million', sortable: true, class: "d-none d-md-table-cell"}
+                {key: 'name', sortable: true, class: "text-center"}, 
+                {key: 'total_cases', sortable: true, class:"text-center", formatter: this.numberWithCommas}, 
+                {key: 'total_deaths', sortable: true, class: "text-center", formatter: this.numberWithCommas}, 
+                {key: 'total_tests', sortable: true, class: "text-center d-none d-md-table-cell", formatter: this.numberWithCommasTests},
+                {key: 'total_deaths_per_million', sortable: true, class: "column-class d-none d-md-table-cell text-center", formatter: this.numberWithCommas},
+                {key: 'total_cases_per_million', sortable: true, class: "column-class text-center d-none d-md-table-cell", formatter: this.numberWithCommas}
                 ]
         }
     },
     computed: {
-        //this is the computed list which is displayed in the table, this replaces the 0 with - and puts commas in
-        //then filters for the search query
-        computedList: function () {
-            var vm = this
-            let tempList = lodash.cloneDeep(this.countries)
-            tempList.forEach(element => {
-                element.total_cases = this.numberWithCommas(element.total_cases)
-                element.total_deaths = this.numberWithCommas(element.total_deaths)
-                element.total_tests = this.numberWithCommas(element.total_tests)
-                element.total_deaths_per_million = this.numberWithCommas(element.total_deaths_per_million)
-                element.total_cases_per_million = this.numberWithCommas(element.total_cases_per_million)
-                
-                if(element.total_tests == '0'){
-                    element.total_tests = '-'
-                }
-            });
-            return tempList.filter(function (item) {
-                return item.name.toLowerCase().indexOf(vm.query.toLowerCase()) !== -1
-            }) 
+        
+        casesMapData: function(){
+            let data = {}
+            for(let i = 0; i < this.countries.length; i++){
+                console.log(this.countries[[i].iso])
+                data[getCode(this.countries[i].name)] = parseInt(this.countries[i].total_cases_per_million)
+            }
+            console.log(data)
+            return data;
         },
+    
         numberRows: function(){
-            return this.computedList.length
+            return this.countries.length
         },
         maxDeaths: function(){
             return Math.max.apply(Math, this.countries.map(function(o) { return o.total_deaths; }))
@@ -207,39 +162,33 @@ export default {
         },
     },
     methods:{
-        onSorted(a, b, field){
-            if(field == 'name'){
-                if(a.name < b.name){
-                    return -1
+        // formatNumber(val){
+        //     return
+        // },
+        changeMapData(index){
+            let data = {}
+            for(let i = 0; i < this.countries.length; i++){
+                if(index == 0){
+                    data[getCode(this.countries[i].name)] = parseInt(this.countries[i].total_cases_per_million)
                 }
-                else if(a.name == b.name){
-                    return 0
+                else if(index == 1){
+                     data[getCode(this.countries[i].name)] = parseInt(this.countries[i].total_deaths_per_million)
                 }
-                else{
-                    return 1
-                }
-            }
-            else{
-
-                //replace the "," in the parsed table values
-                let aVal = parseInt(a[field].replace(new RegExp(",", "g"), "").replace("-", "0"))
-                let bVal = parseInt(b[field].replace(new RegExp(",", "g"), "").replace("-", "0"))
-                
-                if(aVal < bVal){
-                    return -1
-                }
-                else if(aVal == bVal){
-                    return 0
-                }
-                else{
-                    return 1
+                else if(index == 2){
+                     data[getCode(this.countries[i].name)] = parseInt(this.countries[i].total_tests_per_thousand)
                 }
             }
-        
+            this.mapData = data;
         },
         //add commas into a number string, utility function
-        numberWithCommas(x) {
-            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        numberWithCommas(val) {
+            return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        numberWithCommasTests(val) {
+            if(val==0){
+                return "-"
+            }
+            else return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
         //converts a digit to hex
         componentToHex(c) {
@@ -260,8 +209,77 @@ export default {
     }
 }
 
+
+// //this is to populate the map with data when the countries is filled from api, this is better to do 
+        // //in a method call from parents but still works
+        // countries: function(newVal){
+        //     var vm = this;
+        //     var casesMap = this.$refs.casesMap
+            
+        //     var casesDoc;
+        //     casesMap.addEventListener("load", function(){
+        //         casesDoc = casesMap.contentDocument;
+                
+        //         for(let i=0; i<newVal.length; i++){
+        //             var r = '[data-name="';
+        //             var s = r.concat(newVal[i].name)
+        //             var t = s.concat('"]')
+        //             try{
+                        
+        //                 var path = casesDoc.querySelectorAll(t)
+        //                 var val = Math.round(255 - ((newVal[i].total_cases_per_million / vm.maxCasesMillion) * 255))
+        //                 path[0].style.fill=vm.rgbToHex(val, val, val)
+                        
+        //             }
+        //             catch(e){
+        //                 console.log(e)
+        //             }
+        //         }
+        //     })
+        //     var deathsMap = this.$refs.deathsMap
+        //     var deathsDoc;
+        //     deathsMap.addEventListener("load", function(){
+        //         deathsDoc = deathsMap.contentDocument;
+        //         for(let i=0; i<newVal.length; i++){
+        //             var r = '[data-name="';
+        //             var s = r.concat(newVal[i].name)
+        //             var t = s.concat('"]')
+        //             try{
+        //                 var path = deathsDoc.querySelectorAll(t)
+        //                 var val = Math.round(255 - ((newVal[i].total_deaths_per_million / vm.maxDeathsMillion) * 255))
+        //                 path[0].style.fill=vm.rgbToHex(val, val, val)
+                        
+        //             }
+        //             catch(e){
+        //                 console.log(e)
+        //             }
+        //         }
+        //     })
+        //     var testsMap = this.$refs.testsMap
+        //     var testsDoc;
+        //     testsMap.addEventListener("load", function(){
+        //         testsDoc = testsMap.contentDocument;
+        //         for(let i=0; i<newVal.length; i++){
+        //             var r = '[data-name="';
+        //             var s = r.concat(newVal[i].name)
+        //             var t = s.concat('"]')
+        //             try{
+        //                 var path = testsDoc.querySelectorAll(t)
+        //                 var val = Math.round(255 - ((newVal[i].total_tests_per_thousand / vm.maxTestsThousand) * 255))
+        //                 path[0].style.fill=vm.rgbToHex(val, val, val)
+                        
+        //             }
+        //             catch(e){
+        //                 console.log(e)
+        //             }
+        //         }
+        //     })
+        // }
 </script>
 
-<style scoped>
-
+<style>
+    .column-class{
+        
+        max-width: 130px;
+    }
 </style>
