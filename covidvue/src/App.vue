@@ -34,7 +34,7 @@
 
 import DisplayData from './components/DisplayData.vue'
 import TotalData from './components/TotalData.vue'
-import WorldChange from './components/WorldChange.vue'
+//import WorldChange from './components/WorldChange.vue'
 import WorldData from './components/Map/WorldData.vue'
 import axios from 'axios'
 
@@ -51,7 +51,7 @@ export default {
   components: {
     DisplayData,
     TotalData,
-    WorldChange,
+    //WorldChange,
     WorldData
   },
   methods:{
