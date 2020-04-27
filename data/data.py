@@ -5,6 +5,7 @@ from models import Base
 from owid import owid
 from oxford import oxford
 from population import population
+from milken import milken
 
 
 def stringToFloat(str):
@@ -31,4 +32,5 @@ if __name__ == '__main__':
     owid(session)
     oxford(session)
     population(session)
+    milken(session)
     

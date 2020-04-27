@@ -6,29 +6,29 @@ from models import MilkenData
 def milken(thisSession):
     try:
         file = 'milken.csv'
-        cr = csv.reader(file, delimiter=",")
+        with open(file) as milken_csv:
+            cr = csv.reader(milken_csv, delimiter=",")
 
-        thisSession.query(MilkenData).delete()
+            thisSession.query(MilkenData).delete()
 
-        first_row=next(cr)
-        for row in cr:
-            #print(row[2].split("-")[0])
-            milkenData= MilkenData(**{
-                'treatment_or_vaccine': row[0],
-                'catagory': row[1],
-                'description': row[2],
-                'stage': row[3],
-                'next_steps': row[4],
-                'clinical_trials': row[5],
-                'developer': row[6],
-                'funder': row[7],
-                'results': row[8],
-                'other_uses': row[9],
-                'fda_approval': row[10]
-            })
-            thisSession.add(milkenData)
-        thisSession.commit()
-    
+            first_row=next(cr)
+            for row in cr:
+                milkenData= MilkenData(**{
+                    'treatment_or_vaccine': row[2].replace('*', ''),
+                    'catagory': row[3].replace('*', ''),
+                    'description': row[4].replace('*', ''),
+                    'stage': row[5].replace('*', ''),
+                    'next_steps': row[6].replace('*', ''),
+                    'clinical_trials': row[7].replace('*', ''),
+                    'developer': row[8].replace('*', ''),
+                    'funder': row[9].replace('*', ''),
+                    'results': row[10].replace('*', ''),
+                    'other_uses': row[11].replace('*', ''),
+                    'fda_approval': row[12].replace('*', '')
+                })
+                thisSession.add(milkenData)
+            thisSession.commit()
+        
     except Exception as e:
         print(e)
         thisSession.rollback()
