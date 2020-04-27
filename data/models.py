@@ -151,5 +151,5 @@ class MilkenData(Base):
             funder = self.funder,
             results = self.results,
             other_uses = self.other_uses,
-            fda_approval = fda_approval 
+            fda_approval = self.fda_approval 
         )

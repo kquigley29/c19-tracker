@@ -4,7 +4,7 @@ from flask import request
 from flask_cors import CORS, cross_origin
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import OwidData, OxfordData
+from models import OwidData, OxfordData, MilkenData
 from models import Base
 import json
 import copy
@@ -41,6 +41,7 @@ def countryData(country):
                 r.total_tests = query[i].total_tests
                 r.total_tests_per_thousand = query[i].total_tests_per_thousand
                 break
+
     return (r.toJson())
 
 
@@ -83,6 +84,7 @@ def allCountries():
                     i = i-1
             r.append(t.toJson())
         session.close()
+
     return (jsonify(r))
 
 
@@ -129,6 +131,7 @@ def allHistoryData():
                 numDays = numDays-1
             r[name] = copy.deepcopy(temp)
             temp = []
+
     return (jsonify(r))
 
 
@@ -181,6 +184,65 @@ def oxfordHistoryIndividual(country):
     r = []
     for t in query:
         r.append(t.toJson())
+
+    return (jsonify(r))
+
+
+# -----------
+# Milken Data
+# -----------
+
+@app.route("/milken/all")
+@cross_origin()
+def milkenAll():
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    query = session.query(MilkenData).all()
+    session.close()
+    
+    r = []
+    for t in query:
+        # deep copy is done so that the object is not a reference to 
+        # the database so modifying it produces no changes in database
+        s = copy.deepcopy(t)
+        r.append(s.toJson())
+
+    return (jsonify(r))
+
+
+@app.route("/milken/treatments")
+@cross_origin()
+def milkenTreatments():
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    query = session.query(MilkenData).filter_by(treatment_or_vaccine='Treatment')
+    session.close()
+    
+    r = []
+    for t in query:
+        # deep copy is done so that the object is not a reference to 
+        # the database so modifying it produces no changes in database
+        s = copy.deepcopy(t)
+        r.append(s.toJson())
+
+    return (jsonify(r))
+
+
+@app.route("/milken/vaccines")
+@cross_origin()
+def milkenVaccines():
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    query = session.query(MilkenData).filter_by(treatment_or_vaccine='Vaccine')
+    session.close()
+    
+    r = []
+    for t in query:
+        # deep copy is done so that the object is not a reference to 
+        # the database so modifying it produces no changes in database
+        s = copy.deepcopy(t)
+        r.append(s.toJson())
+
     return (jsonify(r))
 
 
