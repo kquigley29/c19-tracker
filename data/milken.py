@@ -14,7 +14,6 @@ def getCsv():
     response = get(milkenUrl)
     milkenTracker = response.content
     page = BeautifulSoup(milkenTracker, 'html.parser')
-
     csvUrl = page.find('a', href=True, text='VIEW COVID-19 TRACKER')['href']
 
     # set the optionsand preferences for Firefox with selenium
@@ -23,9 +22,9 @@ def getCsv():
     profile = webdriver.FirefoxProfile()
     profile.set_preference('browser.download.folderList', 2)
     profile.set_preference('browser.download.manager.showWhenStarting', False)
-    profile.set_preference('browser.download.dir', getcwd())
-    profile.set_preference('browser.helperApps.neverAsk.saveToDisk', ('text/csv'))
-    profile.set_preference('browser.download.dir', '~/c19-tracker/data')
+    profile.set_preference('browser.download.dir', getcwd())                         # downloads to the current directory
+    profile.set_preference('browser.helperApps.neverAsk.saveToDisk', ('text/csv'))   # no pop up window when downloading csv files
+    # profile.set_preference('browser.download.dir', '~/c19-tracker/data')            
 
     # find and download the csv version of the google sheet
     driver = webdriver.Firefox(firefox_profile=profile, options=options)
@@ -45,7 +44,6 @@ def getCsv():
 def milken(thisSession):
     # retrieve the csv file to insert into the df
     getCsv()
-      
 
     try:
         file = 'milken.csv'

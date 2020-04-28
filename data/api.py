@@ -4,7 +4,7 @@ from flask import request
 from flask_cors import CORS, cross_origin
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import OwidData, OxfordData, MilkenData
+from models import OwidData, OxfordData, MilkenData, PopulationData
 from models import Base
 import json
 import copy
@@ -14,7 +14,7 @@ app=Flask(__name__)
 cors = CORS(app)
 engine = create_engine("sqlite:///data.db")
 Base.metadata.create_all(engine)
-
+app.config['DEBUG'] = True
 
 # ---------
 # Owid data
@@ -42,7 +42,7 @@ def countryData(country):
                 r.total_tests_per_thousand = query[i].total_tests_per_thousand
                 break
 
-    return (r.toJson())
+    return r.toJson()
 
 
 # get latest data for all countries
@@ -85,7 +85,7 @@ def allCountries():
             r.append(t.toJson())
         session.close()
 
-    return (jsonify(r))
+    return jsonify(r)
 
 
 # get the historical data for a country
@@ -99,7 +99,8 @@ def countryHistoryData(country):
     r = []
     for t in query:
         r.append(t.toJson())
-    return (jsonify(r))
+    
+    return jsonify(r)
 
 #get past two weeks for every country
 @app.route("/owid/history/allRecent")
@@ -132,7 +133,7 @@ def allHistoryData():
             r[name] = copy.deepcopy(temp)
             temp = []
 
-    return (jsonify(r))
+    return jsonify(r)
 
 
 # ----------
@@ -152,7 +153,7 @@ def oxfordCurrentIndividual(country):
     # the database so modifying it produces no changes in database
     r = copy.deepcopy(query[query.count()-1])
 
-    return (r.toJson())
+    return r.toJson()
 
 # get latest data for all countries
 @app.route("/oxford/current/all")
@@ -170,7 +171,7 @@ def oxfordCurrentAll():
         else:
             r.append(t.toJson())
 
-    return (jsonify(r))
+    return jsonify(r)
 
 
 # get the historical data for a country
@@ -185,13 +186,14 @@ def oxfordHistoryIndividual(country):
     for t in query:
         r.append(t.toJson())
 
-    return (jsonify(r))
+    return jsonify(r)
 
 
 # -----------
 # Milken Data
 # -----------
 
+# get all data on treatments and vaccines
 @app.route("/milken/all")
 @cross_origin()
 def milkenAll():
@@ -207,9 +209,10 @@ def milkenAll():
         s = copy.deepcopy(t)
         r.append(s.toJson())
 
-    return (jsonify(r))
+    return jsonify(r)
 
 
+# get data on treatments only
 @app.route("/milken/treatments")
 @cross_origin()
 def milkenTreatments():
@@ -225,9 +228,10 @@ def milkenTreatments():
         s = copy.deepcopy(t)
         r.append(s.toJson())
 
-    return (jsonify(r))
+    return jsonify(r)
 
 
+# get data on vaccines only
 @app.route("/milken/vaccines")
 @cross_origin()
 def milkenVaccines():
@@ -243,7 +247,44 @@ def milkenVaccines():
         s = copy.deepcopy(t)
         r.append(s.toJson())
 
-    return (jsonify(r))
+    return jsonify(r)
+
+
+# ---------------------------
+# Worldometer Population Data
+# ---------------------------
+
+@app.route("/worldometer/population/all")
+@cross_origin()
+def populationAll():
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    query = session.query(PopulationData).all()
+    session.close()
+
+    r = []
+    for t in query:
+        # deep copy is done so that the object is not a reference to 
+        # the database so modifying it produces no changes in database
+        s = copy.deepcopy(t)
+        r.append(s.toJson())
+    
+    return jsonify(r)
+
+
+@app.route('/worldometer/population/<country>')
+@cross_origin()
+def populationIndividual(country):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    query = session.query(PopulationData).filter_by(country=country)
+    session.close()
+    
+    # deep copy is done so that the object is not a reference to 
+    # the database so modifying it produces no changes in database
+    r = copy.deepcopy(query[-1])
+
+    return r.toJson()
 
 
 if(__name__ == '__main__'):

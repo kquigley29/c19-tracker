@@ -8,17 +8,7 @@ from population import population
 from milken import milken
 
 
-def stringToFloat(str):
-    b = 0
-    try:
-        b = int(float(str))
-    except:
-        b = 0
-    finally:
-        return b
-
-
-if __name__ == '__main__':
+def fillTables():
     engine = create_engine("sqlite:///data.db")
 
     Base.metadata.create_all(engine)
@@ -34,3 +24,6 @@ if __name__ == '__main__':
     population(session)
     milken(session)
     
+
+if __name__ == '__main__':
+    fillTables()
