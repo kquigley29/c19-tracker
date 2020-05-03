@@ -123,3 +123,39 @@ class PopulationData(Base):
             urban_population = self.urban_population,
             world_share = self.world_share
         )
+
+
+class MilkenData(Base):
+    __tablename__ = 'Milken_data'
+    __table_args__ = {'sqlite_autoincrement':True}
+    id = Column(Integer, primary_key=True, nullable=False)
+    treatment_or_vaccine = Column(Text)
+    catagory = Column(Text)
+    description = Column(Text)
+    stage = Column(Text)
+    next_steps = Column(Text)
+    clinical_trials = Column(Text)
+    developer = Column(Text)
+    funder = Column(Text)
+    results = Column(Text)
+    other_uses = Column(Text)
+    fda_approval = Column(Text)
+
+    def __repr__(self):
+        return f'Product {self.description}'
+
+    def toJson(self):
+        return dict(
+            id = self.id,
+            treatment_or_vaccine = self.treatment_or_vaccine,
+            catagory = self.catagory,
+            description = self.description,
+            stage = self.stage,
+            next_steps = self.next_steps,
+            clinical_trials = self.clinical_trials,
+            developer = self.developer,
+            funder = self.funder,
+            results = self.results,
+            other_uses = self.other_uses,
+            fda_approval = self.fda_approval 
+        )

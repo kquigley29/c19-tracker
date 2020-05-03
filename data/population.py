@@ -13,26 +13,33 @@ def stringToFloat(str):
     finally:
         return b
 
+
+def getTable():
+    url = "https://www.worldometers.info/world-population/population-by-country/"
+    response = requests.get(url)
+    worldometers_population = response.content
+    page = BeautifulSoup(worldometers_population, 'html.parser')
+    table = page.find('tbody')
+    rows = table.find_all('tr')
+    
+    table_list = []
+    for row in rows:
+        row_list = []
+        row_data = row.find_all('td')
+        for entry in row_data:
+            row_list.append(entry.text)
+        table_list.append(row_list)
+
+    return table_list
+
+
 def population(thisSession):
     try:
-        url = "https://www.worldometers.info/world-population/population-by-country/"
-        response = requests.get(url)
-        worldometers_population = response.content
-        page = BeautifulSoup(worldometers_population, 'html.parser')
-        table = page.find('tbody')
-        rows = table.find_all('tr')
-        
-        table_list = []
-        for row in rows:
-            row_list = []
-            row_data = row.find_all('td')
-            for entry in row_data:
-                row_list.append(entry.text)
-            table_list.append(row_list)
+        table = getTable()
 
         thisSession.query(PopulationData).delete()
 
-        for row in table_list:
+        for row in table:
             row_dict = {}
 
             try:
