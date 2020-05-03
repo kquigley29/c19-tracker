@@ -1,125 +1,105 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, Float, Date, Text
-
-Base = declarative_base()
-
-class OwidData(Base):
-    __tablename__ = 'Owid_data'
-    __table_args__ = {'sqlite_autoincrement': True}
-    id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(Text)
-    date = Column(Date)
-    total_cases = Column(Integer)
-    new_cases = Column(Integer)
-    total_deaths = Column(Integer)
-    new_deaths = Column(Integer)
-    total_cases_per_million = Column(Integer)
-    total_deaths_per_million = Column(Integer)
-    total_tests = Column(Integer)
-    new_tests = Column(Integer)
-    total_tests_per_thousand = Column(Integer)
-
-    def __repr__(self):
-        return f'Country {self.name}'
-
-    def toJson(self):
-        return dict(
-            id = self.id,
-            name = self.name,
-            date = self.date,
-            total_cases = self.total_cases,
-            new_cases = self.new_cases,
-            total_deaths = self.total_deaths,
-            new_deaths = self.new_deaths,
-            total_cases_per_million = self.total_cases_per_million,
-            total_deaths_per_million = self.total_deaths_per_million,
-            total_tests = self.total_tests,
-            new_tests = self.new_tests,
-            total_tests_per_thousand = self.total_tests_per_thousand
-        )
+import requests
+import codecs
+from models import PopulationData
+from bs4 import BeautifulSoup
 
 
-class OxfordData(Base):
-    __tablename__ = 'Oxford_data'
-    __table_args__ = {'sqlite_autoincrement': True}
-    id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(Text)
-    date = Column(Date)
-    school_closing = Column(Integer)
-    workplace_closing = Column(Integer)
-    cancel_public_events = Column(Integer)
-    close_public_transport = Column(Integer)
-    public_information_campaigns = Column(Integer)
-    internal_movement_restrictions = Column(Integer)
-    international_travel_controls = Column(Integer)
-    fiscal_measures = Column(Integer)
-    monetary_measures = Column(Integer)
-    emergency_investment_in_healthcare = Column(Integer)
-    investment_in_vaccines = Column(Integer)
-    testing_framework = Column(Integer)
-    contact_tracing = Column(Integer)
-    stringency_index = Column(Integer)
-    stringency_index_for_display = Column(Integer)
+def stringToFloat(str):
+    b = 0
+    try:
+        b = int(float(str))
+    except:
+        b = 0
+    finally:
+        return b
 
+def population(thisSession):
+    try:
+        url = "https://www.worldometers.info/world-population/population-by-country/"
+        response = requests.get(url)
+        worldometers_population = response.content
+        page = BeautifulSoup(worldometers_population, 'html.parser')
+        table = page.find('tbody')
+        rows = table.find_all('tr')
+        
+        table_list = []
+        for row in rows:
+            row_list = []
+            row_data = row.find_all('td')
+            for entry in row_data:
+                row_list.append(entry.text)
+            table_list.append(row_list)
 
-    def __repr__(self):
-        return f'Country {self.name}'
+        thisSession.query(PopulationData).delete()
 
-    def toJson(self):
-        return dict(
-            id = self.id,
-            name = self.name,
-            date = self.date,
-            school_closing = self.school_closing,
-            workplace_closing = self.workplace_closing,
-            cancel_public_events = self.cancel_public_events,
-            close_public_transport = self.close_public_transport,
-            public_information_campaigns = self.public_information_campaigns,
-            internal_movement_restrictions = self.internal_movement_restrictions,
-            international_travel_controls = self.international_travel_controls,
-            fiscal_measures = self.fiscal_measures,
-            monetary_measures = self.monetary_measures,
-            emergency_investment_in_healthcare = self.emergency_investment_in_healthcare,
-            investment_in_vaccines = self.investment_in_vaccines,
-            testing_framework = self.testing_framework,
-            contact_tracing = self.contact_tracing,
-            stringency_index = self.stringency_index,
-            stringency_index_for_display = self.stringency_index_for_display
-        )
+        for row in table_list:
+            row_dict = {}
 
+            try:
+                row_dict['rank'] = int(row[0].replace(',', ''))
+            except ValueError:
+                row_dict['rank'] = None
+        
+            row_dict['country'] = row[1]
+        
+            try:
+                row_dict['population'] = int(row[2].replace(',', ''))
+            except ValueError:
+                row_dict['population'] = None
+            
+            try:
+                row_dict['yearly_change'] = float(row[3].replace('%', ''))
+            except ValueError:
+                row_dict['yearly_change'] = None
+            
+            try:
+                row_dict['net_change'] = int(row[4].replace(',', ''))
+            except ValueError:
+                row_dict['net_change'] = None
+            
+            try:
+                row_dict['density'] = int(row[5].replace(',', ''))
+            except ValueError:
+                row_dict['density'] = None
+            
+            try:
+                row_dict['land_area'] = int(row[6].replace(',', ''))
+            except ValueError:
+                row_dict['land_area'] = None
+            
+            try:
+                row_dict['migrants'] = int(row[7].replace(',', ''))
+            except ValueError:
+                row_dict['migrants'] = None
+            
+            try:
+                row_dict['fertility_rate'] = float(row[8])
+            except ValueError:
+                row_dict['fertility_rate'] = None
+            
+            try:
+                row_dict['median_age'] = int(row[9])
+            except ValueError:
+                row_dict['median_age'] = None
+            
+            try:
+                row_dict['urban_population'] = float(row[10].replace('%', ''))
+            except ValueError:
+                row_dict['urban_population'] = None
+            
+            try:
+                row_dict['world_share'] = float(row[11].replace('%', ''))
+            except ValueError:
+                row_dict['world_share'] = None
 
-class PopulationData(Base):
-    __tablename__ = 'Population'
-    __table_args__ = {'sqlite_autoincrement':True}
-    id = Column(Integer, primary_key=True, nullable=False)
-    rank = Column(Integer)
-    country = Column(Text)
-    population = Column(Integer)
-    yearly_change = Column(Float)
-    net_change = Column(Integer)
-    density = Column(Integer)
-    land_area = Column(Integer)
-    migrants = Column(Integer)
-    fertility_rate = Column(Float)
-    median_age = Column(Integer)
-    urban_population = Column(Integer)
-    world_share = Column(Float)
+            populationData= PopulationData(**row_dict)
 
-    def __repr__(self):
-        return f'Country {self.country}'
+            thisSession.add(populationData)
+        thisSession.commit()
+    
+    except Exception as e:
+        print(e)
+        thisSession.rollback()
 
-    def toJson(self):
-        return dict(
-            id = self.id,
-            country = self.country,
-            population = self.population,
-            yearly_change = self.yearly_change,
-            net_change = self.net_change,
-            density = self.density,
-            land_area = self.land_area,
-            migrants = self.migrants,
-            fertility_rate = self.fertility_rate,
-            median_age = self.median_age,
-            urban_population = self.urban_population,
-            world_share = self.world_share
-        )
+    finally:
+        thisSession.close()
