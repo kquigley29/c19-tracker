@@ -1,6 +1,6 @@
 <template>
   <div class="vue-worldy-map">
-    <MapData @hoverCountrys="onHoverCountrys" @hoverLeaveCountrys="onHoverLeaveCountrys" />
+    <MapData />
     <div
       v-if="legend.name"
       class="vue-mapy-legend"
@@ -104,6 +104,9 @@ export default {
     };
   },
   methods: {
+    onClickCountry(name){
+      this.$emit('countryClicked', name)
+    },
     onHoverCountrys(country) {
       this.legend = country;
       this.position = country.position;

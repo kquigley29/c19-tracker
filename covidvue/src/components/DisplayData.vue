@@ -1,10 +1,11 @@
 <template>
     <div>
-        <b-card class="mb-5" no-body>
+        <b-card class="mb-5 text-center" no-body>
         <b-tabs card>
-            <b-tab no-body title="Statistics">
+            <b-tab no-body title="Population Statistics">
             <input  v-model="query" placeholder=" Country" class=" w-100 mt-3">
             <b-table 
+            class="table-hover row-hover"
             responsive 
             outlined 
             :filter="query"
@@ -36,24 +37,31 @@
                 :per-page="perPage"
                 ></b-pagination>
             </b-tab>
-            <b-tab no-body :disabled="isBusy" title="Map">
-                <!-- <b-card no-body> -->
-                    <b-tabs @activate-tab="changeMapData" card>
-                        <div class="mt-2">
-                            <b-tab class="text-center" no-body title="Cases">
-                                <!-- <h5>Cases per Million</h5> -->
-                            </b-tab>
-                            <b-tab no-body class="text-center" title="Deaths"> 
-                                <!-- <h5>Deaths per Million</h5>              -->
-                            </b-tab>
-                            <b-tab no-body class="text-center" title="Tests">
-                                <!-- <h5>Tests per Thousand</h5>          -->
-                            </b-tab>
-                        </div>
-                    </b-tabs>
-                    <MapChart lowColor="#f9fdff" highColor="#12a0e8" v-if="countries.length > 5" :countryData="mapData"/>
-
-                <!-- </b-card> -->
+            <b-tab class="text-center" no-body :disabled="isBusy" title="Visualizations">
+                <b-tabs class="text-center" @activate-tab="changeMapData" card>
+                    <div class="mt-2">
+                        <b-tab class="text-center" no-body title="Cases">
+                            <h5>Cases per Million</h5>
+                        </b-tab>
+                        <b-tab no-body class="text-center" title="Deaths"> 
+                            <h5>Deaths per Million</h5>             
+                        </b-tab>
+                        <b-tab no-body class="text-center" title="Tests">
+                            <h5>Tests per Thousand</h5>         
+                        </b-tab>
+                        <b-tab no-body class="text-center" title="Stringency">
+                            <h5>Stringency Index</h5>         
+                        </b-tab>
+                    </div>
+                </b-tabs>
+                <MapChart :lowColor="lowCol" :highColor="highCol" v-if="countries.length > 5" :countryData="mapData"/>
+                <div style="width: 100%;" class="d-flex justify-content-center mt-4 mb-2">
+                <div class="d-flex justify-content-center align-items-stretch" style="width: 50%;">
+                    <p class="mr-2">{{minData}}</p>
+                    <b-card class="flex-fill" style="background: linear-gradient(to right, #dae3f3, #203864)" no-body><div style="height: 25px"></div></b-card>
+                    <p class="ml-2">{{maxData}}</p>
+                </div>
+                </div>
             </b-tab>
         </b-tabs>
         </b-card>
@@ -95,12 +103,16 @@ export default {
     name: "DataDisplay",
     props: {
         countries: Array,
+        countryStringency: Array,
         //isBusy prop is bound so component knows when data is received, this could be done as a data variable
         //and a method to change it in parent component which would be better
         isBusy: Boolean,
         summary: Object
     },
     watch: {
+        countryStringency: function(){
+            this.changeMapData(0)
+        },
         countries: function(){
             this.changeMapData(0)
         }
@@ -111,6 +123,10 @@ export default {
         return{
             //default sorting
             mapData: {},
+            //lowCol and highCol
+            lowCol: "#dae3f3",
+            highCol: "#203864",
+            //default saorting
             sortBy: "total_cases",
             //sort descending
             sortDesc: true,
@@ -144,7 +160,15 @@ export default {
             console.log(data)
             return data;
         },
-    
+
+        maxData: function(){
+            let arr = Object.values(this.mapData);
+            return Math.max(...arr)
+        },
+        minData: function(){
+            let arr = Object.values(this.mapData);
+            return Math.min(...arr)
+        },
         numberRows: function(){
             return this.countries.length
         },
@@ -168,6 +192,9 @@ export default {
         changeMapData(index){
             let data = {}
             for(let i = 0; i < this.countries.length; i++){
+                if(this.countries[i].name == "San Marino" || this.countries[i].name == "Vatican" || this.countries[i].name == "Andorra"){
+                    continue
+                }
                 if(index == 0){
                     data[getCode(this.countries[i].name)] = parseInt(this.countries[i].total_cases_per_million)
                 }
@@ -176,6 +203,12 @@ export default {
                 }
                 else if(index == 2){
                      data[getCode(this.countries[i].name)] = parseInt(this.countries[i].total_tests_per_thousand)
+                }
+                
+            }
+            if(index == 3){
+                for(let i =0; i < this.countryStringency.length; i++){
+                    data[getCode(this.countryStringency[i].name)] = parseInt(this.countryStringency[i].stringency_index_for_display)
                 }
             }
             this.mapData = data;
@@ -205,7 +238,15 @@ export default {
             this.modalCountry = item
             this.$bvModal.show("modal-1")
             
-        }
+        },
+        getMaxData(d){
+            return Object.keys(d).reduce((a, b) => d[a] > d[b] ? d[a] : d[b]);
+        },
+        getMinData(d){
+            return Object.keys(d).reduce((a, b) => d[a] < d[b] ? d[a] : d[b]);
+        },
+        
+
     }
 }
 
@@ -277,9 +318,19 @@ export default {
         // }
 </script>
 
-<style>
+<style scoped>
     .column-class{
         
         max-width: 130px;
+    }
+
+    .b-table > tbody > tr:hover .row-hover{
+        cursor: pointer;
+    }
+    tr {
+        cursor: pointer;
+    }
+    .table-hover:hover{
+        cursor: pointer;
     }
 </style>

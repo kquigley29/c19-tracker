@@ -212,6 +212,10 @@ export default {
                 
 				_this.$emit('hoverLeaveCountrys');
 			});
+			// path.addEventListener('mouseleave', (e) => {
+                
+			// 	_this.$emit('onClickCountry', e.target.attributes.title.value);
+			// });
 		});
 	},
 };

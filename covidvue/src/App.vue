@@ -2,28 +2,34 @@
   <div id="app">
     <b-container fluid="md">
     <b-row class="mb-2" align-v="center">
-      <b-col class="text-center">
-        
-      <!-- <a target="_blank" href="https://www.visceraltd.com/"><b-img class="mb-5" fluid :src="require('./assets/VisceraLogo.png')"/></a> -->
-        <a target="_blank" href="https://www.visceraltd.com/"><img class="mb-5" style="width: 80%" fluid src='./assets/VisceraLogo.png'/></a>
+      <b-col md class="text-center">
+          <a target="_blank" href="https://www.visceraltd.com/"><img class="mb-5" style="width: 30%" fluid src='./assets/VisceraLogo.png'/></a>
       </b-col>
-      <b-col>
-        <world-data :countryData="{US: 500,
-        GB: 300
-        }"/>
-      </b-col>
+      
     </b-row>
-    <b-row>
-      <b-col md>
-        <total-data :loading="summaryLoading" class="mb-2" style="width:" v-bind:summary="casesSummary" v-bind:countries="countryList"/>
+    <!-- <b-container> -->
+    <b-row class="mb-2" style="height: 100%;">
+     
+      <b-col class= "align-items-center" md stylel="height: 100%">
+        <div></div>
+        <total-data :loading="summaryLoading" style="height: 100%" class="align-self-stretch flex-fill" v-bind:summary="casesSummary" v-bind:countries="countryList"/>
+       
       </b-col>
-      <b-col md>
-        <total-data :loading="summaryLoading" class="mb-2" style="width:" v-bind:summary="casesSummary" v-bind:countries="countryList"/>
+      <b-col class="text-center" md>
+        <b-card  header="World Weekly Change">
+        <world-change v-bind:countries="countryListLong"/>
+        </b-card>
+
       </b-col>
+      
+      <!-- <b-col md>
+        <total-data :loading="summaryLoading" class="mb-2" style="width:" v-bind:summary="casesSummary" v-bind:countries="countryList"/>
+      </b-col> -->
     </b-row>
+    <!-- </b-container> -->
     <b-row>
       <b-col>
-      <display-data id="display" ref="displayData" v-bind:summary="casesSummary" v-bind:isBusy="isBusy" class="" v-bind:countries='countryList'/>
+      <display-data :countryStringency="countryStringency" id="display" ref="displayData" v-bind:summary="casesSummary" v-bind:isBusy="isBusy" class="" v-bind:countries='countryList'/>
       </b-col>
     </b-row>
     </b-container>
@@ -34,8 +40,7 @@
 
 import DisplayData from './components/DisplayData.vue'
 import TotalData from './components/TotalData.vue'
-//import WorldChange from './components/WorldChange.vue'
-import WorldData from './components/Map/WorldData.vue'
+import WorldChange from './components/WorldChange.vue'
 import axios from 'axios'
 
 export default {
@@ -43,6 +48,8 @@ export default {
   data() {
     return{
       countryList: [],
+      countryListLong: {},
+      countryStringency: [],
       casesSummary: {},
       isBusy: true,
       summaryLoading: true
@@ -51,21 +58,33 @@ export default {
   components: {
     DisplayData,
     TotalData,
-    //WorldChange,
-    WorldData
+    WorldChange,
   },
   methods:{
 
   },
   mounted(){
     //get the country data from our api
-    axios.get("https://keane.pythonanywhere.com/all")
+    axios.get("https://keane.pythonanywhere.com/owid/current/all")
       .then(res => {
-        //console.log(display);
         this.countryList = res.data;
         //console.log(this.countryList)
         this.isBusy = false;
       })
+      .catch(e => console.log(e))
+
+    axios.get("https://keane.pythonanywhere.com/owid/history/allRecent")
+    .then(res => {
+      this.countryListLong = res.data;
+    })
+    .catch(e => console.log(e));
+
+    axios.get("https://keane.pythonanywhere.com/oxford/current/all")
+    .then(res => {
+      this.countryStringency = res.data;
+    })
+    .catch(e => console.log(e));
+    
       
     //get the summary data from this api
     //TODO: Add this data to the api
@@ -91,5 +110,6 @@ export default {
  
   color: #2c3e50;
   margin-top: 60px;
+
 }
 </style>
