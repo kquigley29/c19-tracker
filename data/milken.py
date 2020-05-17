@@ -24,7 +24,6 @@ def getCsv():
     profile.set_preference('browser.download.manager.showWhenStarting', False)
     profile.set_preference('browser.download.dir', getcwd())                         # downloads to the current directory
     profile.set_preference('browser.helperApps.neverAsk.saveToDisk', ('text/csv'))   # no pop up window when downloading csv files
-    # profile.set_preference('browser.download.dir', '~/c19-tracker/data')            
 
     # find and download the csv version of the google sheet
     driver = webdriver.Firefox(firefox_profile=profile, options=options)
