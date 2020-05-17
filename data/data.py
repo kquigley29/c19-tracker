@@ -22,7 +22,7 @@ def fillTables():
     owid(session)
     oxford(session)
     population(session)
-    milken(session)
+    # milken(session)
     
 
 if __name__ == '__main__':

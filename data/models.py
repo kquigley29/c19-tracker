@@ -42,18 +42,26 @@ class OxfordData(Base):
     school_closing = Column(Integer)
     workplace_closing = Column(Integer)
     cancel_public_events = Column(Integer)
+    gatherings_restrictions = Column(Integer)
     close_public_transport = Column(Integer)
-    public_information_campaigns = Column(Integer)
+    stay_at_home_requirements = Column(Integer)
     internal_movement_restrictions = Column(Integer)
     international_travel_controls = Column(Integer)
+    income_support = Column(Integer)
+    debt_relief = Column(Integer)
     fiscal_measures = Column(Integer)
-    monetary_measures = Column(Integer)
+    international_support = Column(Integer)
+    public_information_campaigns = Column(Integer)
+    testing_policy = Column(Integer)
+    contact_tracing = Column(Integer)
     emergency_investment_in_healthcare = Column(Integer)
     investment_in_vaccines = Column(Integer)
-    testing_framework = Column(Integer)
-    contact_tracing = Column(Integer)
+    confirmed_cases = Column(Integer)
+    confirmed_deaths = Column(Integer)
     stringency_index = Column(Integer)
     stringency_index_for_display = Column(Integer)
+    legacy_stringency_index = Column(Integer)
+    legacy_stringency_index_for_display = Column(Integer)
 
 
     def __repr__(self):
@@ -67,18 +75,26 @@ class OxfordData(Base):
             school_closing = self.school_closing, 
             workplace_closing = self.workplace_closing,
             cancel_public_events = self.cancel_public_events,
+            gatherings_restrictions = self.gatherings_restrictions,
             close_public_transport = self.close_public_transport,
-            public_information_campaigns = self.public_information_campaigns,
+            stay_at_home_requirements = self.stay_at_home_requirements,
             internal_movement_restrictions = self.internal_movement_restrictions,
             international_travel_controls = self.international_travel_controls,
+            income_support = self.income_support,
+            debt_relief = self.debt_relief,
             fiscal_measures = self.fiscal_measures,
-            monetary_measures = self.monetary_measures,
+            international_support = self.international_support,
+            public_information_campaigns = self.public_information_campaigns,
+            testing_policy = self.testing_policy,
+            contact_tracing = self.contact_tracing,
             emergency_investment_in_healthcare = self.emergency_investment_in_healthcare,
             investment_in_vaccines = self.investment_in_vaccines,
-            testing_framework = self.testing_framework,
-            contact_tracing = self.contact_tracing,
+            confirmed_cases = self.confirmed_cases,
+            confirmed_deaths = self.confirmed_deaths,
             stringency_index = self.stringency_index,
-            stringency_index_for_display = self.stringency_index_for_display
+            stringency_index_for_display = self.stringency_index_for_display,
+            legacy_stringency_index = self.legacy_stringency_index,
+            legacy_stringency_index_for_display = self.legacy_stringency_index_for_display
         )
 
 

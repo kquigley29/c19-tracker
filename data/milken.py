@@ -16,7 +16,7 @@ def getCsv():
     page = BeautifulSoup(milkenTracker, 'html.parser')
     csvUrl = page.find('a', href=True, text='VIEW COVID-19 TRACKER')['href']
 
-    # set the optionsand preferences for Firefox with selenium
+    # set the options and preferences for Firefox with selenium
     options = Options()
     options.headless = True
     profile = webdriver.FirefoxProfile()
@@ -37,7 +37,7 @@ def getCsv():
 
     # rename the csv
     system("rm milken.csv")
-    system("mv 'COVID-19 Treatment and Vaccine Tracker - Treatments and Vaccines.csv' milken.csv")
+    system("mv COVID-19\ Treatment\ and\ Vaccine\ Tracker\*.csv milken.csv")
 
 
 def milken(thisSession):
