@@ -43,7 +43,7 @@ def owid(thisSession):
         thisSession.commit()
     
     except Exception as e:
-        print(e)
+        print(e + " :owid")
         thisSession.rollback()
     finally:
         

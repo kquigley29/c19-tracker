@@ -12,7 +12,7 @@ import copy
 
 app=Flask(__name__)
 cors = CORS(app)
-engine = create_engine("sqlite:////home/keane/visceraApi/data.db")
+engine = create_engine("sqlite:///data.db")
 Base.metadata.create_all(engine)
 app.config['DEBUG'] = True
 
