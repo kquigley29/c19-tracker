@@ -37,7 +37,7 @@ def getCsv():
 
     # rename the csv
     system("rm milken.csv")
-    system("mv COVID-19\ Treatment\ and\ Vaccine\ Tracker\*.csv milken.csv")
+    system("mv *.csv milken.csv")
 
 
 def milken(thisSession):
