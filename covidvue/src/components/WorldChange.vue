@@ -69,7 +69,7 @@ export default {
                     continue
                 }
                 let calc = (countryData[13].total_cases - countryData[7].total_cases) - (countryData[6].total_cases - countryData[0].total_cases)
-                if(calc < 0){
+                if(calc <= 0){
                     data[name] = -1
                 }
                 else{

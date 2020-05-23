@@ -16,8 +16,36 @@
        
       </b-col>
       <b-col class="text-center" md>
-        <b-card  header="World Weekly Change">
-        <world-change v-bind:countries="countryListLong"/>
+        <b-card style="height: 100%" header="World Weekly Change">
+        <b-container>
+        <b-row>
+        <world-change style="width: 100%" v-bind:countries="countryListLong"/>
+        </b-row>
+        <b-row class="mt-2">
+          <b-col md>
+            <div class="d-flex align-items-center">
+              <b-card style="background: #860000; max-height: 15px; max-width: 15px" class="mr-3">
+                
+              </b-card>
+              <p>Cases this week > Cases last week</p>
+              <p>
+
+              </p>
+            </div>
+          </b-col>
+          <b-col md>
+            <div class="d-flex align-items-center">
+              <b-card style="background: #548235; max-height: 15px; max-width: 15px" class="mr-3">
+                
+              </b-card>
+              <p>Cases this week &lt; Cases last week</p>
+              <p>
+
+              </p>
+            </div>
+          </b-col>
+        </b-row>
+        </b-container>
         </b-card>
 
       </b-col>

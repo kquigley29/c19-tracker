@@ -6,7 +6,7 @@
             <input  v-model="query" placeholder=" Country" class=" w-100 mt-3">
             <b-table 
             class="table-hover row-hover"
-            responsive 
+            rexsponsive 
             outlined 
             :filter="query"
             v-bind:current-page="currentPage" 
