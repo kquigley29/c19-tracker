@@ -28,15 +28,15 @@ def countryData(country):
     session = Session()
     query = session.query(OwidData).filter_by(name=country)
     session.close()
-    
-    # deep copy is done so that the object is not a reference to 
+
+    # deep copy is done so that the object is not a reference to
     # the database so modifying it produces no changes in database
     r = copy.deepcopy(query[query.count()-1])
 
-    # if there is no test data for this day, then traverse backwards 
+    # if there is no test data for this day, then traverse backwards
     # through the days and set the test data to the most recent one
-    if(r.total_tests == 0):              
-        for i in range(query.count()-1, -1, -1):          
+    if(r.total_tests == 0):
+        for i in range(query.count()-1, -1, -1):
             if(query[i].total_tests != 0):
                 r.total_tests = query[i].total_tests
                 r.total_tests_per_thousand = query[i].total_tests_per_thousand
@@ -52,29 +52,48 @@ def allCountries():
     Session = sessionmaker(bind=engine)
     session = Session()
     query = session.query(OwidData).all()
-    
+
     length = len(query)
     r=[]
     for index, t in enumerate(query):
         if index != (length-1):
+            if t.name == "World":
+
+                continue
             if t.name != query[index+1].name:
-                # this tests if the total_tests is 0, if so it looks at previous 
+                # this tests if the total_tests is 0, if so it looks at previous
                 # days until the tests is not 0 and assigns that value
                 temp = copy.deepcopy(t)
-                if(t.total_tests == 0):              
+                if(t.total_tests == 0):
                     i = index-1
                     while(query[i].name == t.name):
                         if(query[i].total_tests != 0):
                             temp.total_tests = query[i].total_tests
-                            temp.total_tests_per_thousand = query[i].total_tests
+                            temp.total_tests_per_thousand = query[i].total_tests_per_thousand
                             break
                         i = i-1
-                
+                if(t.total_cases == 0):
+                    i = index-1
+                    while(query[i].name == t.name):
+                        if(query[i].total_cases != 0):
+                            temp.total_cases = query[i].total_cases
+                            temp.total_cases_per_million = query[i].total_cases_per_million
+                            break
+                        i = i-1
+                if(t.total_deaths == 0):
+                    i = index-1
+                    while(query[i].name == t.name):
+                        if(query[i].total_deaths != 0):
+                            temp.total_deaths = query[i].total_deaths
+                            temp.total_deaths_per_million = query[i].total_deaths_per_million
+                            break
+                        i = i-1
+
                 r.append(temp.toJson())
-                
-        else: 
+
+        else:
             temp = copy.deepcopy(t)
-            if(t.total_tests == 0):              
+            if(t.total_tests == 0):
                 i = index-1
                 while(query[i].name == t.name):
                     if(query[i].total_tests != 0):
@@ -119,6 +138,9 @@ def allHistoryData():
                 numDays = 13
                 name = t.name
                 while(numDays>=0):
+                    if query[index-numDays].name != name:
+                        numDays=numDays-1
+                        continue
                     temp.append(query[index-numDays].toJson())
                     numDays = numDays-1
                 r[name] = copy.deepcopy(temp)
@@ -148,8 +170,8 @@ def oxfordCurrentIndividual(country):
     session = Session()
     query = session.query(OxfordData).filter_by(name=country)
     session.close()
-    
-    # deep copy is done so that the object is not a reference to 
+
+    # deep copy is done so that the object is not a reference to
     # the database so modifying it produces no changes in database
     r = copy.deepcopy(query[query.count()-1])
 

@@ -16,7 +16,6 @@ def stringToFloat(str):
 
 def oxford(thisSession):
     try:
-        # url = "https://ocgptweb.azurewebsites.net/CSVDownload"        # old url
         url = "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest.csv"
         response = requests.get(url)
         text = response.iter_lines()
@@ -56,9 +55,9 @@ def oxford(thisSession):
 
             thisSession.add(oxfordData)
         thisSession.commit()
-    
+
     except Exception as e:
-        print(e)
+        print(e + " :oxford")
         thisSession.rollback()
 
     finally:

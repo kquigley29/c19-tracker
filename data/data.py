@@ -5,7 +5,7 @@ from models import Base
 from owid import owid
 from oxford import oxford
 from population import population
-from milken import milken
+#from milken import milken
 
 
 def fillTables():

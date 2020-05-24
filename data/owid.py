@@ -31,7 +31,9 @@ def owid(thisSession):
                 'name': row[1],
                 'date': datetime(int(row[2].split("-")[0]), int(row[2].split("-")[1]), int(row[2].split("-")[2])),
                 'total_cases': stringToFloat(row[3]),
+                'new_cases': stringToFloat(row[4]),
                 'total_deaths': stringToFloat(row[5]),
+                'new_deaths': stringToFloat(row[6]),                
                 'total_cases_per_million': stringToFloat(row[7]),
                 'total_deaths_per_million': stringToFloat(row[9]),
                 'total_tests': stringToFloat(row[11]),
@@ -41,7 +43,7 @@ def owid(thisSession):
         thisSession.commit()
     
     except Exception as e:
-        print(e)
+        print(e + " :owid")
         thisSession.rollback()
     finally:
         

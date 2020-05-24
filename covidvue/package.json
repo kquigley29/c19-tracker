@@ -1,5 +1,5 @@
 {
-  "name": "covidvue",
+  "name": "VisceraCovidTracker",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,10 +12,14 @@
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.11.0",
     "chart.js": "^2.9.3",
+    "chroma": "0.0.1",
+    "chroma-js": "^2.1.0",
     "core-js": "^3.6.4",
+    "country-list": "^2.2.0",
     "lodash": "^4.17.15",
     "vue": "^2.6.11",
-    "vue-chartjs": "^3.5.0"
+    "vue-chartjs": "^3.5.0",
+    "vue-map-chart": "0.0.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",
@@ -24,6 +28,8 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "node-sass": "^4.13.1",
+    "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {

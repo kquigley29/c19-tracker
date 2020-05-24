@@ -7,28 +7,34 @@ class OwidData(Base):
     __tablename__ = 'Owid_data'
     __table_args__ = {'sqlite_autoincrement': True}
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(Text) 
+    name = Column(Text)
     date = Column(Date)
     total_cases = Column(Integer)
+    new_cases = Column(Integer)
     total_deaths = Column(Integer)
+    new_deaths = Column(Integer)
     total_cases_per_million = Column(Integer)
     total_deaths_per_million = Column(Integer)
     total_tests = Column(Integer)
+    new_tests = Column(Integer)
     total_tests_per_thousand = Column(Integer)
 
     def __repr__(self):
         return f'Country {self.name}'
-    
+
     def toJson(self):
         return dict(
-            id = self.id, 
-            name = self.name, 
-            date = self.date, 
-            total_cases = self.total_cases, 
+            id = self.id,
+            name = self.name,
+            date = self.date,
+            total_cases = self.total_cases,
+            new_cases = self.new_cases,
             total_deaths = self.total_deaths,
+            new_deaths = self.new_deaths,
             total_cases_per_million = self.total_cases_per_million,
             total_deaths_per_million = self.total_deaths_per_million,
             total_tests = self.total_tests,
+            new_tests = self.new_tests,
             total_tests_per_thousand = self.total_tests_per_thousand
         )
 
@@ -37,7 +43,7 @@ class OxfordData(Base):
     __tablename__ = 'Oxford_data'
     __table_args__ = {'sqlite_autoincrement': True}
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(Text) 
+    name = Column(Text)
     date = Column(Date)
     school_closing = Column(Integer)
     workplace_closing = Column(Integer)
@@ -66,13 +72,13 @@ class OxfordData(Base):
 
     def __repr__(self):
         return f'Country {self.name}'
-    
+
     def toJson(self):
         return dict(
-            id = self.id, 
-            name = self.name, 
-            date = self.date, 
-            school_closing = self.school_closing, 
+            id = self.id,
+            name = self.name,
+            date = self.date,
+            school_closing = self.school_closing,
             workplace_closing = self.workplace_closing,
             cancel_public_events = self.cancel_public_events,
             gatherings_restrictions = self.gatherings_restrictions,
