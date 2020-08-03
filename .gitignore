@@ -1,7 +1,10 @@
 *.pdf
 *.csv
 *.db
-/__pycache__
-/*/__pycache__
+__pycache__
 *.ods
 *.log
+
+venv
+
+.idea
