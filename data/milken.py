@@ -70,7 +70,7 @@ def milken(thisSession):
             thisSession.commit()
         
     except Exception as e:
-        print(e)
+        print(e, "[milken]")
         thisSession.rollback()
     finally:
         

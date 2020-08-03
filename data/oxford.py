@@ -57,7 +57,7 @@ def oxford(thisSession):
         thisSession.commit()
 
     except Exception as e:
-        print(e + " :oxford")
+        print(e, "[oxford]")
         thisSession.rollback()
 
     finally:

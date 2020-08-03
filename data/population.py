@@ -105,7 +105,7 @@ def population(thisSession):
         thisSession.commit()
     
     except Exception as e:
-        print(e + " :population")
+        print(e, "[population]")
         thisSession.rollback()
 
     finally:
