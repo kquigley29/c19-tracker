@@ -32,12 +32,12 @@ def owid(thisSession):
                 'date': datetime(int(row[3].split("-")[0]), int(row[3].split("-")[1]), int(row[3].split("-")[2])),
                 'total_cases': stringToFloat(row[4]),
                 'new_cases': stringToFloat(row[5]),
-                'total_deaths': stringToFloat(row[6]),
-                'new_deaths': stringToFloat(row[7]),
-                'total_cases_per_million': stringToFloat(row[8]),
-                'total_deaths_per_million': stringToFloat(row[10]),
-                'total_tests': stringToFloat(row[13]),
-                'total_tests_per_thousand': stringToFloat(row[14])
+                'total_deaths': stringToFloat(row[7]),
+                'new_deaths': stringToFloat(row[8]),
+                'total_cases_per_million': stringToFloat(row[10]),
+                'total_deaths_per_million': stringToFloat(row[13]),
+                'total_tests': stringToFloat(row[17]),
+                'total_tests_per_thousand': stringToFloat(row[18])
             })
             thisSession.add(owidData)
         thisSession.commit()
