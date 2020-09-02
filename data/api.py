@@ -11,7 +11,8 @@ import copy
 
 app = Flask(__name__)
 cors = CORS(app)
-engine = create_engine("sqlite:///data.db")
+db_path = "sqlite:///data.db"
+engine = create_engine(db_path)
 Base.metadata.create_all(engine)
 app.config['DEBUG'] = True
 
