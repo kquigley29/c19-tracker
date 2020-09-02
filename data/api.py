@@ -4,9 +4,9 @@ from flask import request
 from flask_cors import CORS, cross_origin
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from data.models import OwidData, OxfordData, MilkenData, PopulationData
-from data.models import Base
-from data.config import db_path
+from models import OwidData, OxfordData, MilkenData, PopulationData
+from models import Base
+from config import db_path
 import json
 import copy
 

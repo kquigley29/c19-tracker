@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import selenium
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
-from data.models import MilkenData
+from models import MilkenData
 
 
 def getCsv():

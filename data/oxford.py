@@ -2,7 +2,7 @@ import csv
 import requests
 import codecs
 from datetime import datetime
-from data.models import OxfordData
+from models import OxfordData
 
 
 def stringToFloat(str):

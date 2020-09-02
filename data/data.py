@@ -1,12 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.orm import sessionmaker
-from data.models import Base
-from data.owid import owid
-from data.oxford import oxford
-from data.population import population
-# from data.milken import milken
-from data.config import db_path
+from models import Base
+from owid import owid
+from oxford import oxford
+from population import population
+# from milken import milken
+from config import db_path
 
 
 

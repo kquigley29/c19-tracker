@@ -1,5 +1,5 @@
 import requests
-from data.models import PopulationData
+from models import PopulationData
 from bs4 import BeautifulSoup
 
 
