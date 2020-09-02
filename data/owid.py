@@ -2,7 +2,7 @@ import csv
 import requests
 import codecs
 from datetime import datetime
-from models import OwidData
+from data.models import OwidData
 
 
 def stringToFloat(in_str):

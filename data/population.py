@@ -1,6 +1,5 @@
 import requests
-import codecs
-from models import PopulationData
+from data.models import PopulationData
 from bs4 import BeautifulSoup
 
 

@@ -4,14 +4,14 @@ from flask import request
 from flask_cors import CORS, cross_origin
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import OwidData, OxfordData, MilkenData, PopulationData
-from models import Base
+from data.models import OwidData, OxfordData, MilkenData, PopulationData
+from data.models import Base
+from data.config import db_path
 import json
 import copy
 
 app = Flask(__name__)
 cors = CORS(app)
-db_path = "sqlite:///data.db"
 engine = create_engine(db_path)
 Base.metadata.create_all(engine)
 app.config['DEBUG'] = True
