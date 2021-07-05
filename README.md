@@ -1,7 +1,7 @@
 # Covid-19 Tracker
 
 ## Webpage
-The tracker is available directly from [this link](https://covid.visceraltd.com/)
+No longer hosted :(
 
 ## Sources
 Cases, Deaths and Recovered: [Our World in Data](https://covid.ourworldindata.org)\
